@@ -11,6 +11,7 @@ sudo lsof -i :8080
 kill -9 <PID>
 http://localhost:8080/api
 http://localhost:4200
+ng g m autenticacao
 ```
 
 @01-Entendendo a arquitetura modular 
@@ -585,3 +586,537 @@ Organizar a aplicação para aplicar a arquitetura modular do angular;
 Estruturar um novo módulo;
 Criar novos módulos na aplicação;
 Refatorar o módulo raiz.
+
+#### 06/03/2024
+
+@02-Aplicando a modularização
+
+@@01
+Projeto da aula anterior
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
+
+https://github.com/alura-cursos/3413-jornada-milhas/archive/refs/heads/aula-1.zip
+
+https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-1
+
+@@02
+Módulo home
+
+Vamos continuar a modularizar a aplicação. A ideia é criar um módulo para a tela inicial, a Home.
+Criando um Módulo para a Home
+Vamos abrir o navegador, na página em que a aplicação está em execução. Queremos criar um módulo para conter os componentes de promoções e depoimentos que são exclusivos da Home.
+
+A parte do formulário de passagens é compartilhada entre a tela inicial e a tela de busca, então, por enquanto, se encontra no módulo shared. Vamos retornar ao explorador lateral do VS Code para criar esse novo módulo.
+
+A Home está dentro das pastas "pages" e "app". A forma de organização que estávamos utilizando, por páginas, não fará mais sentido, porque agora estamos organizando por funcionalidades. Na verdade, vamos excluir a pasta "pages" mais adiante.
+
+Clicaremos com o botão direito na pasta "home", selecionando "New File" (Novo Arquivo) e vamos criar um módulo que se chamará home.module.ts. Em seu interior, vamos criar a estrutura desse módulo com @ngModule(). Entre os seus parênteses, adicionaremos um par de chaves.
+
+Abaixo desse @ngModule({}), vamos exportar essa nova classe com export class HomeModule e um par de chaves. Por fim, entre as chaves do HomeModule @ngModule({}), vamos utilizar a propriedade declarations com dois pontos e um bloco de colchetes.
+
+@ngModule({
+    declarations: [
+    
+    ]
+})
+export class HomeModule { }
+COPIAR CÓDIGO
+Acessando o explorador lateral, veremos os três componentes a serem declarados nesse módulo: "depoimentos", "promocoes" e "home". Vamos declará-los como PromocoesComponent, DepoimentosComponent e HomeComponent, todos com iniciais maiúsculas. Ao digitar os nomes dos componentes, utilizaremos as sugestões do VS Code para importar cada um deles.
+
+import { DepoimentosComponent } from "./depoimentos/depoimentos.component";
+import { HomeComponent } from "./home.component";
+import { PromocoesComponent } from "./promocoes/promocoes.component";
+
+@ngModule({
+    declarations: [
+        PromocoesComponent,
+        DepoimentosComponent,
+        HomeComponent
+    ]
+})
+export class HomeModule {
+}
+COPIAR CÓDIGO
+Na sequência, vamos importar o ngModule para corrigir o erro na linha @ngModule({. Abaixo dos colchetes de declarations, vamos adicionar os imports que precisamos:
+
+O CommonModule, para ter acesso às diretivas do Angular;
+O MaterialModule, utilizado em toda a aplicação;
+O SharedModule.
+Por enquanto, esses três módulos. Também utilizaremos as sugestões do VS Code para importar cada um deles.
+
+import { DepoimentosComponent } from "./depoimentos/depoimentos.component";
+import { HomeComponent } from "./home.component";
+import { PromocoesComponent } from "./promocoes/promocoes.component";
+
+@ngModule({
+    declarations: [
+        PromocoesComponent,
+        DepoimentosComponent,
+        HomeComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        SharedModule,
+    ]
+})
+export class HomeModule {
+}
+COPIAR CÓDIGO
+Abaixo dos colchetes de imports, vamos exportar esses componentes em um bloco exports para que todos os módulos que importarem o módulo da Home tenham acesso a eles. Vamos copiar as linhas PromocoesComponent, DepoimentosComponent e HomeComponent, adicionando-as entre os colchetes dos imports.
+
+@ngModule({
+    declarations: [
+        HomeComponent,
+        PromoçõesComponent,
+        DepoimentosComponent,
+    ],
+    imports:  [
+        CommonModule,
+        MaterialModule,
+        SharedModule,
+    ],
+    exports: [
+        HomeComponent,
+        PromoçõesComponent,
+        DepoimentosComponent
+    ]
+})
+export class HomeModule {
+}
+COPIAR CÓDIGO
+O módulo está pronto.Agora podemos organizar o appModule. Vamos acessar o appModule.ts por meio do explorador lateral e remover das declarations o HomeComponent, PromocoesComponent e DepoimentosComponent.
+
+Ao apagar as declarations, deixamos os imports no início do arquivo. Esses itens que não estão sendo usados vão aparecer com uma cor mais escura na tela. Sendo assim, vamos excluir todos os import que não estamos mais utilizando.
+
+O resultado completo pode ser visto abaixo.
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { LoginComponent } from './pages/login/login.component';
+import { CadastroComponent } from './pages/cadastro/cadastro.component';
+import { PerfilComponent } from './pages/perfil/perfil.component';
+import { AutenticacaoInterceptor } from './core/interceptors/autenticacao.interceptor';
+import { BuscaComponent } from './pages/busca/busca.component';
+import { SharedModule } from './shared/shared.module';
+import { MaterialModule } from './core/material/material.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    CadastroComponent,
+    PerfilComponent,
+    BuscaComponent
+  ],
+  // Código omitido
+})
+export class AppModule { }
+COPIAR CÓDIGO
+Percebe-se que o appModule vai diminuindo as suas responsabilidades à medida que o processo avança. Já que estamos falando de boas práticas, podemos melhorar ainda mais essa organização.
+
+Uma boa prática no Angular é organizar esses imports da seguinte forma: primeiro, mantemos os imports que vêm do próprio Angular, como o ngModule e o browserModule. Em seguida, deixamos uma linha vazia e, depois, incluímos os imports que pertencem a componentes da própria aplicação.
+
+Vamos recortar a linha import { ReactiveFormsModule } from '@angular/forms'; e colá-la abaixo do BrowserModule. Outro que é do Angular é a linha import { BrowserAnimationsModule } from '@angular/platform-browser/animations';, vamos recortá-la e colá-la abaixo da outra que colamos. Agora, esses quatro primeiros imports são do Angular, abaixo dos quais deixamos uma linha vazia entre eles e os outros imports.
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { LoginComponent } from './pages/login/login.component';
+import { CadastroComponent } from './pages/cadastro/cadastro.component';
+import { PerfilComponent } from './pages/perfil/perfil.component';
+import { AutenticacaoInterceptor } from './core/interceptors/autenticacao.interceptor';
+import { BuscaComponent } from './pages/busca/busca.component';
+import { SharedModule } from './shared/shared.module';
+import { MaterialModule } from './core/material/material.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    CadastroComponent,
+    PerfilComponent,
+    BuscaComponent
+  ],
+  // Código omitido
+})
+export class AppModule { }
+COPIAR CÓDIGO
+Podemos fazer o mesmo no arquivo shared.module.ts da pasta "shared", organizando seus imports do Angular primeiro. Vamos acessá-lo para recortar as linhas abaixo e colá-las a partir da linha 2.
+
+import { ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+Com isso, os imports do shareModule também estão organizados.
+
+import { NgModule } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+
+import { BannerComponent } from "./banner/banner.component";
+import { BotaoControleComponent } from "./botao-controle/botao-controle.component";
+import { CardBuscaComponent } from "./card-busca/card-busca.component";
+import { CardDepoimentoComponent } from "./card-depoimento/card-depoimento.component";
+import { CardComponent } from "./card/card.component";
+import { ContainerComponent } from "./container/container.component";
+import { DropdownUfComponent } from "./dropdown-uf/dropdown-uf.component";
+import { FooterComponent } from "./footer/footer.component";
+import { FormBaseComponent } from "./form-base/form-base.component";
+import { CompanhiasComponent } from "./form-busca/filtros-complementares/companhias/companhias.component";
+import { FiltrosComplementaresComponent } from "./form-busca/filtros-complementares/filtros-complementares.component";
+import { LabelComponent } from "./form-busca/filtros-complementares/label/label.component";
+import { ParadasComponent } from "./form-busca/filtros-complementares/paradas/paradas.component";
+import { PrecosComponent } from "./form-busca/filtros-complementares/precos/precos.component";
+import { FormBuscaComponent } from "./form-busca/form-busca.component";
+import { HeaderComponent } from "./header/header.component";
+import { ModalComponent } from "./modal/modal.component";
+import { PassagemDestaqueComponent } from "./passagem-destaque/passagem-destaque.component";
+import { PassagemComponent } from "./passagem/passagem.component";
+import { SeletorPassageiroComponent } from "./seletor-passageiro/seletor-passageiro.component";
+import { MaterialModule } from "../core/material/material.module";
+COPIAR CÓDIGO
+Podemos fechar esse arquivo e voltar ao app.module.ts. Em seu interior, vamos importar o novo módulo. Dentro do arranjo imports, abaixo de MaterialModule, vamos digitar homeModule.
+
+@NgModule({
+  // Código omitido
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule,
+    MaterialModule,
+    HomeModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    ReactiveFormsModule
+  ],
+  // Código omitido
+})
+export class AppModule { }
+COPIAR CÓDIGO
+Podemos conferir se tudo continua funcionando. Vamos voltar ao navegador, recarregar a aplicação e verificar que continua funcionando. Agora, a Home possui um módulo próprio.
+
+@@03
+Modularizando uma biblioteca
+
+Imagine que você está trabalhando em um projeto de uma biblioteca virtual de literatura clássica usando Angular, e quer modularizar a aplicação. Para isso, você precisa usar a estrutura do @ngModule para criar módulos de funcionalidade.
+Selecione a alternativa que contém a melhor forma de você iniciar a modularização da aplicação.
+
+Usar um @ngModule para categorizar os livros por gênero, por exemplo, um módulo para literatura clássica, outro para ficção científica e assim por diante.
+ 
+Categorizar os livros por gênero é uma abordagem mais eficaz e organizada. Isso permite que você crie um módulo para cada gênero literário, tornando a aplicação mais modular e fácil de manter e atualizar.
+Alternativa correta
+Usar um @ngModule para cada livro da literatura clássica.
+ 
+Alternativa correta
+Criar um único @ngModule para todas as funcionalidades da biblioteca.
+ 
+Mesmo que um único @ngModule possa teoricamente gerenciar todas as funcionalidades, é uma prática melhor e mais organizada criar módulos distintos para funções ou recursos específicos.
+
+@@04
+Módulo de autenticação
+
+Continuando o processo de organização do nosso projeto, vamos criar um módulo muito importante: o módulo de autenticação. Nele, pretendemos reunir todos os elementos, componentes, serviços e tudo que compõe a funcionalidade de autenticação.
+Criando o Módulo de Autenticação
+Já criamos bastante de forma manual, contudo, agora vamos criar com a ajuda do CLI.
+
+Para abrir o terminal do VS Code, digitaremos "Ctrl+J" e em seguida "Ctrl+C" para interromper a aplicação.
+
+Para criar um módulo, digitaremos o seguinte comando no terminal, onde g corresponde a generate e m a module:
+
+A seguir, vamos passar o nome do módulo, que, no nosso caso, será "autenticação", sem cedilha e sem til.
+
+ng g m autenticacao
+COPIAR CÓDIGO
+Ao pressionar "Enter", fecharemos o terminal. No explorador lateral, notaremos que dentro da pasta "app" foi criado o módulo Autenticacao, que consiste em uma pasta chamada "autenticacao" e, dentro dessa pasta, o arquivo autenticacao.module.ts. Vamos acessá-lo e fechar a aba do arquivo home.modute.ts.
+
+Dentro do autenticacao.module, a CLI já traz a estrutura inicial, importando o NgModule e o CommonModule e já inclui o Decorator com o arranjo declarations vazio e o CommonModule entre colchetes do imports.
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+    declarations: [],
+    imports: [
+        CommonModule
+    ]
+})
+export class AutenticacaoModule { }
+COPIAR CÓDIGO
+Para declarar os componentes que comporão esse módulo de autenticação, vamos acessar o explorador novamente, selecionar os componentes "cadastro", "login" e "perfil" que estão dentro da pasta "pages", um de cada vez, e arrastá-los para a pasta "autenticacao".
+
+Para cada movimentação de pastas, será exibida uma janela de diálogo perguntando se temos certeza que queremos mover esses arquivos. Basta clicar em "Move" (mover).
+
+Dentro do módulo de autenticação, temos o arquivo do módulo e os três componentes.
+
+autenticacao
+cadastro
+login
+perfil
+autenticacao.module.ts
+Esses três componentes serão adicionados entre os colchetes das declarations, um abaixo do outro, na ordem abaixo:
+
+CadastroComponent;
+LoginComponent e
+PerfilComponent.
+Entre os colchetes de imports, abaixo do CommonModule, adicionaremos o ShareModule e na linha 16, o MaterialModule. Abaixo dos imports, criaremos o arranjo de exports e em snós interior, exportaremos os três componentes, copiando-os no arranjo declarations e colando-os entre os colchetes.
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+    declarations: [
+        CadastroComponent,
+        LoginComponent,
+        PerfilComponent
+    ],
+    imports: [
+        CommonModule
+        CadastroComponent,
+        LoginComponent,
+        PerfilComponent
+    ]
+})
+export class AutenticacaoModule { }
+COPIAR CÓDIGO
+Como a ideia do módulo é ser independente e conter tudo que está relacionado à autenticação, moveremos também os serviços que estão relacionados a essa funcionalidade.
+
+Acessando o explorador, dentro da pasta "core", temos a pasta "services" que contém todos os serviços da aplicação. Podemos dividi-los entre os módulos.
+
+Inclusive, existem dois arquivos de teste dentro dessa pasta: companhia.service.spec.ts e passagens.service.spec.ts. Entretanto, como estamos padronizando para não deixar esses arquivos, pois não utilizamos testes nesse projeto ainda, vamos excluí-los.
+
+Clicaremos com o botão direito na pasta "autenticacao", selecionaremos "New Folder" (novo arquivo) e criaremos uma pasta chamada "services". Moveremos os arquivos dos quatro serviços que dizem respeito à autenticação — autenticacao.service, token.service, user.service e cadastro.service — para dentro dessa pasta.
+
+No módulo criado anteriormente, o "home", criaremos outra pasta chamada "services" e movemos os serviços promocao.service e depoimento.service para dentro dela.
+
+Na pasta "services" original, sobraram alguns serviços que distribuiremos posteriormente.
+
+O nosso módulo de autenticação já está pronto. Temos os componentes e os serviços. Vamos ver pelo explorador o que mais faz sentido trazer para esse módulo de autenticação.
+
+Dentro da pasta "core", temos uma pasta chamada "guards", que contém o guarda de rotas do perfil: auth.guard.ts. Além disso, dentro da pasta "interceptors", abaixo de "guards", temos o interceptor de autenticação autenticacao.interceptor.ts. Como, por enquanto, só temos um guarda de rotas e um interceptor, vamos movê-los para o módulo de autenticação.
+
+Deste modo, os diretórios "guards" e "interceptors" ficaram vazios, por isso, vamos deletá-los.
+
+Agora, nosso módulo de autenticação está completo, com os componentes, serviços, interceptor e guarda de rotas. Tudo que faz parte desse módulo está dentro dele.
+
+Agora, precisamos organizar o app module. Vamos acessar o arquivo app.module.ts e remover os componentes que declaramos no outro módulo. Lembrando que os componentes não podem estar declarados em dois módulos ao mesmo tempo.
+
+Para isso, vamos deletar as linhas LoginComponent, CadastroComponent e PerfilComponent dentro de declarations, que são as declarações dos componentes de "login", "cadastro" e "perfil". Depois, vamos adicionar o novo módulo de autenticação no arranjo imports, abaixo de HomeModule. Ele será importado no topo do arquivo, abaixo das outras importações.
+
+Também podemos excluir as importações de LoginComponent, CadastroComponent e PerfilComponent, porque não precisamos mais delas. Por fim, vamos mover a linha import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http', que é o import do Angular, para a linha 5, abaixo de BrowserAnimationsModule.
+
+O resultado pode ser visto abaixo.
+
+Corpo do código:
+@NgModule({
+  declarations: [
+    AppComponent,
+    BuscaComponent
+  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        SharedModule,
+        MaterialModule,
+        HomeModule,
+        AutenticacaoModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        ReactiveFormsModule
+  ],
+  // Código omitido
+})
+export class AppModule { }
+COPIAR CÓDIGO
+Seção de importações:
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { AutenticacaoInterceptor } from './autenticacao/autenticacao.interceptor';
+import { BuscaComponent } from './pages/busca/busca.component';
+import { SharedModule } from './shared/shared.module';
+import { MaterialModule } from './core/material/material.module';
+import { HomeModule } from './home/home.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
+COPIAR CÓDIGO
+Prontinho. Com isso, o AppModule está se tornando muito mais enxuto e com menos responsabilidades.
+
+Dentro do diretório "pages", temos somente os diretórios "busca" e "home", mas não queremos mais o diretório "pages". Por isso, vamos mover a pasta "home", arrastando-a para dentro da pasta "app".
+
+Considerando que "home" possui muitas subpastas, o VS Code pode travar ao realizar essa movimentação. Caso não seja possível arrastar, podemos clicar na pasta "home", copiá-la com "Ctrl+C", e clicando no diretório "app", colar com "Ctrl+V". Com isso, "app" já estará com o módulo "home".
+
+Precisamos excluir todas as subpastas que ficaram dentro da "home" original, inclusive ela mesma. Para isso, vamos clicar com o botão direito em cada uma das pastas e selecionar "Delete".Em seguida, clicaremos na própria pasta "home" e pressionaremos "Delete". Pronto.
+
+Fizemos a deleção por etapas porque às vezes, quando nós tentamos deletar um diretório que tem várias subpastas de uma vez, o VS Code pode travar.
+
+Após esse processo, pode aparecer algum erro, porque, às vezes, a CLI não encontra mais o caminho anterior, aonde estava o módulo. Então, dentro do arquivo app.module.ts, importaremos novamente o HomeModule, que não está mais dentro da pasta pages original. Para isso excluiremos a linha import { HomeModule } from './pages/home/home.module e importaremos esse HomeModule de novo.
+
+Para importar novamente, acessaremos a linha HomeModule dentro do arranjo imports clicaremos na lâmpada azul à sua esquerda e selecionaremos "Add import from "./home/home.module"" para importar do local correto.
+
+O código de importação abaixo será gerado na última linha da lista de importações.
+
+import { HomeModule } from './home/home.module';
+COPIAR CÓDIGO
+Voltaremos ao explorador lateral esquerdo e vemos que só restou o componente de busca dentro do diretório "pages". Se acessarmos o app.module.ts, nas declarations, só temos o AppComponent, o componente principal, e esse BuscaComponent.
+
+A busca é uma funcionalidade central em nossa aplicação. Portanto, criaremos um módulo para busca, para que possamos remover o seu import e essa responsabilidade do AppModule.
+
+Além do componente de busca, é importante adicionar também os componentes de filtro abaixo, que estão dentro do caminho de pastas "shared > filtros-complementares":
+
+filtros-complementares
+companhias
+labels
+paradas
+preços
+Eles farão parte desse módulo de busca, junto a alguns services.
+
+Vamos deixar essa tarefa para você praticar. Nós já criamos vários módulos, já sabemos como organizar a aplicação, então, vai ficar para você a tarefa de criar esse novo módulo, o módulo de busca, e depois excluir essa pasta pages.
+
+Caso tenha alguma dúvida, haverá uma atividade nesta aula, com todo o passo a passo que será necessário para fazer isso.
+
+@@05
+Mão na massa: criando o módulo de busca
+
+Agora é a sua vez de praticar utilizando os passos que vimos no curso. O objetivo é criar um módulo para a funcionalidade de busca. Neste módulo, serão agrupados todos os componentes e serviços relacionados a ela.
+
+Para criar o módulo de busca, siga os passos a seguir:
+Clique com o botão direito dentro da pasta busca e selecione a opção New File (Novo arquivo);
+Nomeie o arquivo de acordo com a convenção: busca.module.ts;
+Mova os componentes CompanhiasComponent, LabelComponent, ParadasComponent, PrecosComponent, FiltrosComplementaresComponent, PassagemDestaqueComponent e PassagemComponent da pasta shared para a pasta busca, removendo também esses componentes do array de declarations do arquivo shared.module.ts;
+Crie uma pasta services e mova para ela os serviços companhia.service.ts e passagens.service.ts, que estavam na pasta services dentro da pasta core.
+Após essas mudanças, a estrutura de pastas ficará conforme imagem a seguir:
+
+Estrutura de pastas de um projeto angular, mostrando os componentes e serviços que compõem o módulo de busca.
+
+Esse arquivo terá a seguinte estrutura final:
+
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule } from "@angular/forms";
+
+import { CompanhiasComponent } from "./filtros-complementares/companhias/companhias.component";
+import { LabelComponent } from "./filtros-complementares/label/label.component";
+import { ParadasComponent } from "./filtros-complementares/paradas/paradas.component";
+import { PrecosComponent } from "./filtros-complementares/precos/precos.component";
+import { MaterialModule } from "../core/material/material.module";
+import { SharedModule } from "../shared/shared.module";
+import { FiltrosComplementaresComponent } from "./filtros-complementares/filtros-complementares.component";
+import { PassagemDestaqueComponent } from "./passagem-destaque/passagem-destaque.component";
+import { PassagemComponent } from "./passagem/passagem.component";
+import { BuscaComponent } from "./busca.component";
+
+@NgModule({
+  declarations: [
+    BuscaComponent,
+    ParadasComponent,
+    CompanhiasComponent,
+    PrecosComponent,
+    LabelComponent,
+    FiltrosComplementaresComponent,
+    PassagemComponent,
+    PassagemDestaqueComponent
+  ],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    SharedModule,
+    ReactiveFormsModule,
+  ],
+  exports: [
+    BuscaComponent,
+    ParadasComponent,
+    CompanhiasComponent,
+    PrecosComponent,
+    LabelComponent,
+    FiltrosComplementaresComponent,
+    PassagemComponent,
+    PassagemDestaqueComponent
+  ]
+})
+export class BuscaModule { }
+
+@@06
+Gerenciando dependências em módulos Angular
+
+Você está trabalhando em um projeto Angular que possui vários módulos e deseja garantir que as dependências entre esses módulos sejam gerenciadas de forma eficaz. Você está revisando o código e a configuração dos módulos para entender como as dependências estão sendo resolvidas.
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SharedModule } from '../shared/shared.module';
+import { DependencyComponent } from './dependency.component';
+
+@NgModule({
+  declarations: [DependencyComponent],
+  imports: [CommonModule, SharedModule],
+  exports: [DependencyComponent],
+})
+export class DependencyModule {}
+COPIAR CÓDIGO
+No código de exemplo acima, qual é o propósito da importação SharedModule e como ela afeta o módulo DependencyModule?
+
+Selecione uma alternativa
+
+O SharedModule é um módulo de funcionalidade que encapsula recursos específicos do DependencyModule. Isso ajuda na organização e reutilização de código.
+ 
+O SharedModule é usado para compartilhar recursos entre vários módulos, não para encapsular recursos específicos do DependencyModule.
+Alternativa correta
+O SharedModule é um módulo raiz que deve ser importado em todos os módulos Angular. Ele não tem relação direta com o DependencyModule.
+ 
+Alternativa correta
+O SharedModule é responsável por importar componentes e diretivas compartilhados entre vários módulos. Isso permite que os recursos compartilhados sejam usados no DependencyModule.
+ 
+O SharedModule é usado para importar componentes e diretivas compartilhados, permitindo o uso desses recursos no DependencyModule.
+
+@@07
+Módulo raiz vs. Módulo de funcionalidade
+
+Você está iniciando um novo projeto Angular e está planejando a estrutura do seu aplicativo. Você está se perguntando se deve criar um módulo raiz (root module) ou um módulo de funcionalidade (feature module) como ponto de entrada da sua aplicação.
+// Exemplo de módulo raiz (app.module.ts)
+@NgModule({
+  declarations: [
+    AppComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    // Outros módulos de funcionalidade importados aqui
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule { }
+COPIAR CÓDIGO
+Qual é a diferença fundamental entre um módulo raiz (root module) e um módulo de funcionalidade (feature module) em Angular?
+
+Selecione uma alternativa
+
+Um módulo raiz é usado como ponto de entrada principal da aplicação e normalmente importa módulos de funcionalidade. Um módulo de funcionalidade encapsula recursos relacionados a uma funcionalidade específica da aplicação.
+ 
+Um módulo raiz desempenha um papel crucial no início da aplicação, funcionando como a espinha dorsal que conecta e coordena os diversos módulos de funcionalidade. Em contraste, um módulo de funcionalidade é projetado para agrupar e organizar recursos que são específicos para uma determinada parte ou recurso da aplicação.
+Alternativa correta
+Um módulo raiz é usado para encapsular recursos relacionados a uma funcionalidade específica da aplicação, enquanto um módulo de funcionalidade é usado como ponto de entrada principal da aplicação.
+ 
+Alternativa correta
+Um módulo raiz é usado para encapsular recursos relacionados a uma funcionalidade específica da aplicação, enquanto um módulo de funcionalidade é usado apenas para carregar serviços.
+
+@@08
+O que aprendemos?
+
+Nessa aula, você aprendeu como:
+Diferenciar o módulo raiz dos módulos de funcionalidade;
+Agrupar componentes e services relacionados no mesmo módulo;
+Importar módulos necessários para o funcionamento do featureModule.
