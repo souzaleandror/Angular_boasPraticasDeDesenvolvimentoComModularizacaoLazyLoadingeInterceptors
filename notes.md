@@ -1120,3 +1120,784 @@ Nessa aula, você aprendeu como:
 Diferenciar o módulo raiz dos módulos de funcionalidade;
 Agrupar componentes e services relacionados no mesmo módulo;
 Importar módulos necessários para o funcionamento do featureModule.
+
+#### 07/03/2024
+
+@03-Roteamento e Lazy Loading
+
+@@01
+Projeto da aula anterior
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
+
+https://github.com/alura-cursos/3413-jornada-milhas/archive/refs/heads/aula-2.zip
+
+https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-2
+
+@@02
+Criando módulos de rotas
+
+Na aula passada, nós organizamos a aplicação e criamos diversos módulos de busca e de autenticação. Contudo, quando clicamos em "Cadastre-se" ou "Login" na aplicação no navegador, o redirecionamento não está ocorrendo. Nesta aula, vamos começar a entender como funciona o roteamento quando estamos utilizando esta arquitetura modular do Angular.
+Vamos, então, voltar ao VS Code.
+
+A ideia de criar módulos é para que eles sejam isolados e fiquem independentes na aplicação. Sendo assim, o roteamento desses componentes pertencentes ao módulo também é de responsabilidade do módulo. É como diz aquela frase famosa: "com grandes poderes vêm grandes responsabilidades".
+
+Da mesma forma que o app.module.ts, que é o módulo principal, tem seu arquivo de rotas, o app-routing-module.ts), cada módulo da aplicação também precisará ter seu próprio arquivo de rotas. É nisso que vamos nos concentrar agora.
+
+Arquivo de rotas do módulo home
+Para começar, vamos criar o arquivo de rotas do módulo home. Clicaremos com o botão direito na pasta home e selecionaremos "New File". Seguindo a convenção de nomenclatura, o nome será home-routing.module.ts.
+
+Vamos verificar rapidamente o app-routing.module.ts, para podermos nos basear.
+
+Nesse momento, a instrutora notou haver um import quebrado na linha 3 desse arquivo, de HomeComponent, que precisamos ajustar. Podemos fazer isso apagando o import e importando HomeComponent da linha 12 novamente.
+Esse arquivo de rotas vai conter uma constante chamada routes onde estarão localizados todos os caminhos (paths) e os componentes (components) que são renderizados quando esse caminho é acessado.
+
+Além disso, temos também um decorator @NgModule com os imports e os exports. Ele está importando o módulo do próprio Angular, o RouterModule, e utilizando o método forRoot() para conseguir renderizar essas rotas, que é justamente essa constante declarada na linha 10.
+
+Vamos criar uma estrutura parecida com essa no home-routing.module.ts.
+
+Começaremos decorando essa classe com o @NgModule na linha 1. Entre os parênteses e chaves, adicionaremos os imports e os exports, que serão arrays vazios por enquanto.
+
+Em seguida, vamos exportar a classe na linha 5: export class HomeRoutingModule. Também precisamos importar o NgModule.
+
+home-routing.module.ts
+import { NgModule } from "@angular/core";
+
+@NgModule({
+  imports: [],
+  exports:[]
+})
+export class HomeRoutingModule { }
+COPIAR CÓDIGO
+Vamos criar uma constante que vai representar as rotas desse módulo, chamada routes. As rotas serão específicas de módulo e não influenciarão nas rotas globais da aplicação.
+
+Então, digitaremos na linha 3 const routes, do tipo Routes (que precisamos importar), que será um array que vai conter alguns objetos. Os objetos serão os caminhos da aplicação.
+
+No caso do Home, vamos passar o path como sendo 'home', entre aspas simples, e quando esse caminho for acessado, o componente (component) que desejamos que seja renderizado é o HomeComponent (que também precisamos importar).
+
+import { NgModule } from "@angular/core";
+import { Routes } from "@angular/router";
+import { HomeComponent } from "./home.component";
+
+const routes: Routes = [
+  {
+    path: 'home',
+    component: HomeComponent
+  }
+];
+@NgModule({
+  imports: [],
+  exports:[]
+})
+export class HomeRoutingModule { }
+COPIAR CÓDIGO
+No array de imports, vamos importar o RouterModule seguido de um método de rotas.
+
+Uma diferença importante é que no app-routing, nós estamos utilizando o método forRoot, porque ele é o arquivo de rotas principal. Nos arquivos de rotas dos módulos secundários de funcionalidade, nós vamos utilizar o método forChild, passando as rotas, routes. Nesse caso, serão carregadas as rotas dos módulos de funcionalidade.
+
+Ou seja: forChild é utilizado para esse tipo de módulos, e o forRoot é utilizado apenas uma vez, no módulo principal.
+Por fim, exportaremos o RouterModule. Nosso arquivo de rotas Home-routing.module.ts já está pronto!
+
+import { RouterModule, Routes } from "@angular/router";
+import { HomeComponent } from "./home.component";
+import { NgModule } from "@angular/core";
+
+const routes: Routes = [
+  {
+    path: 'home',
+    component: HomeComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports:[RouterModule]
+})
+export class HomeRoutingModule { }
+COPIAR CÓDIGO
+Importando o arquivo de rotas de home
+Agora, precisamos importar esse arquivo no home.module.ts. Nesse arquivo, na parte de imports, na linha 19, vamos importar o HomeRoutingModule, que é o arquivo que acabamos de criar.
+
+home.module.ts
+imports: [
+    CommonModule,
+    MaterialModule,
+    SharedModule,
+    HomeRoutingModule
+],
+COPIAR CÓDIGO
+Agora que criamos o módulo de rotas e o importamos no módulo Home, nosso próximo passo é fazer um ajuste no módulo de rotas principal.
+
+@@03
+Roteamento de módulos de funcionalidade
+
+Você está desenvolvendo uma aplicação Angular que possui vários módulos de funcionalidade e deseja configurar o roteamento para navegar entre esses módulos. Você está revisando o código de roteamento e precisa entender como configurar o roteamento para um módulo de funcionalidade específico.
+// Exemplo de configuração de roteamento em um módulo de funcionalidade
+const routes: Routes = [
+  {
+    path: 'funcionalidade',
+    component: FuncionalidadeComponent,
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class FuncionalidadeRoutingModule {}
+COPIAR CÓDIGO
+No código de exemplo acima, qual é a finalidade do módulo FuncionalidadeRoutingModule e como ele está configurando o roteamento para o módulo de funcionalidade?
+
+O FuncionalidadeRoutingModule não é necessário para configurar o roteamento em Angular. O roteamento é configurado automaticamente pelo Angular.
+ 
+Alternativa correta
+O FuncionalidadeRoutingModule é usado para configurar o roteamento do módulo raiz. Ele define uma rota com o caminho 'funcionalidade' que carrega o componente FuncionalidadeComponent em todo o aplicativo.
+ 
+Alternativa correta
+O FuncionalidadeRoutingModule é responsável por configurar o roteamento do módulo de funcionalidade. Ele define uma rota com o caminho 'funcionalidade' que carrega o componente FuncionalidadeComponent quando a rota é correspondida.
+ 
+O FuncionalidadeRoutingModule configura o roteamento do módulo de funcionalidade, definindo uma rota com o caminho 'funcionalidade' que carrega o FuncionalidadeComponent quando a rota é correspondida.
+Alternativa correta
+O FuncionalidadeRoutingModule é usado apenas para configurar o roteamento interno dentro do módulo de funcionalidade. Ele não afeta o roteamento global da aplicação.
+
+@@04
+Organizando o AppRoutingModule
+
+Já criamos o arquivo de rotas específico para o módulo Home (HomeRoutingModule). Perceba que, quando acessamos a aplicação com localhost:4200/home, a tela inicial é carregada, e o mesmo acontece ao acessarmos apenas localhost:4200. Não precisamos desse roteamento duplicado.
+Simplificando o roteamento com a propriedade pathMatch
+No VS Code, podemos observar que o app-routing.module está importando diretamente o HomeComponent. Contudo, assim como o app.module - o módulo principal da aplicação - não precisa importar diretamente os componentes, o app-routing.module também não precisa dessa importação direta. Ele pode acessar as rotas desse componente através dos módulos.
+
+Por conta disso, vamos fazer uma modificação. Como já temos no home-routing-module esse caminho para home, no app-routing.module, em vez de importar o HomeComponent na linha 13, podemos utilizar a propriedade redirectTo. Portanto, quando for acessada uma rota vazia (localhost:4200), o redirectTo vai redirecionar para /home.
+
+app-routing.module.ts
+const routes: Routes = [
+  {
+    path: ' ',
+    redirectTo: '/home',
+  },
+// código omitido
+COPIAR CÓDIGO
+Ao retornar para a aplicação, percebemos que nada funciona. Então, ao inspecionar a página e abrir o console do navegador, observamos um erro que indica uma configuração de rotas inválida. Passamos o path vazio e a propriedade redirectTo para /home, mas ainda precisamos fornecer a propriedade pathMatch.
+
+No VS Code, adicionaremos essa propriedade na linha 14 do arquivo app-routing.module, que possui dois valores: full (completo) e prefix (prefixo). No nosso caso, queremos utilizar o valor full.
+
+const routes: Routes = [
+  {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full'
+  },
+// código omitido
+COPIAR CÓDIGO
+Isso significa que o roteador do Angular tentará fazer um match da URL.
+
+Se a propriedade for prefix, ele não verificará a URL completa, logo, na primeira URL que coincidir com localhost:4200, o roteador presumirá que é uma rota (path) vazia, pois não verificará o restante da URL. Passando a propriedade full, ele verificará a URL completa, e redirecionará para home somente se a URL for exatamente localhost:4200, sem nada depois disso.
+
+Vamos retornar à aplicação no navegador para testar, fechando o console e recarregando a página. Quando digitamos a URL localhost:4200, somos redirecionados para localhost:4200/home.
+
+Com essa mudança, tudo está funcionando corretamente. Inclusive, podemos apagar a linha 8 do app-routing.module.ts, pois já não estamos importando diretamente o componente HomeComponent.
+
+No próximo vídeo, vamos falar sobre uma dica valiosa para otimizar nossa aplicação.
+
+@@05
+Diferenças entre forRoot e forChild em Angular
+
+Você está configurando o roteamento em um aplicativo Angular que usa módulos de funcionalidade e está explorando a utilização dos métodos forRoot e forChild no arquivo de roteamento e deseja entender as diferenças entre esses dois métodos.
+@NgModule({
+  imports: [RouterModule.forRoot(appRoutes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+COPIAR CÓDIGO
+@NgModule({
+  imports: [RouterModule.forChild(funcionalidadeRoutes)],
+  exports: [RouterModule],
+})
+export class FuncionalidadeRoutingModule {}
+COPIAR CÓDIGO
+Assinale a alternativa que contém a principal diferença entre os métodos forRoot e forChild ao configurar o roteamento em Angular.
+
+Selecione uma alternativa
+
+O método forRoot é usado para configurar o roteamento no módulo raiz e só deve ser chamado uma vez, enquanto o método forChild é usado para configurar o roteamento em módulos de funcionalidade e pode ser chamado várias vezes para diferentes módulos.
+ 
+forRoot é usado no módulo raiz para configurar o roteamento global, e deve ser chamado apenas uma vez. forChild é usado em módulos de funcionalidade e pode ser chamado várias vezes para adicionar rotas adicionais.
+Alternativa correta
+O método forRoot é usado para configurar o roteamento em módulos de funcionalidade, enquanto o método forChild é usado para configurar o roteamento no módulo raiz.
+ 
+Alternativa correta
+Não há diferença significativa entre forRoot e forChild. Ambos os métodos podem ser usados de forma intercambiável para configurar o roteamento em qualquer módulo.
+ 
+Alternativa correta
+O método forRoot é usado para ativar o roteamento lazy loading, enquanto o método forChild é usado para carregar módulos de funcionalidade.
+
+@@06
+Entendendo o Lazy Loading
+
+Agora, vamos criar um módulo de rotas para o módulo de autenticação.
+Arquivo de rotas para o módulo autenticacao
+No menu lateral esquerdo, vamos clicar com o botão direito em autenticacao, escolher "New File" e nomear esse novo arquivo como autenticacao-routing.module.ts.
+
+Aproveitando que o arquivo de rotas da Home está aberto, utilizaremos "Ctrl + A" e "Ctrl + C" para copiar e colar o código na autenticação, a fim de deixar o processo um pouco mais rápido.
+
+Apagaremos o import de HomeComponent na linha 3, e também apagar as linhas 5 a 8, que define o caminho como 'home' e o componente como HomeComponent. Também vamos mudar o nome da classe exportada na linha 11 para AutenticacaoRoutingModule. Teremos:
+
+autenticacao-routing.module.ts
+import { RouterModule, Routes } from "@angular/router";
+import { NgModule } from "@angular/core";
+
+const routes: Routes = [
+
+];
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports:[RouterModule]
+})
+export class AutenticacaoRoutingModule { }
+COPIAR CÓDIGO
+Em seguida, traremos as rotas que estão no app-routing (de login, cadastro e perfil, os componentes que fazem parte do módulo de autenticação), e vamos levar para o arquivo de rotas específico.
+
+Recortaremos as linhas 15 a 27 do arquivo app-routing.module.ts, utilizando "Ctrl-X", e vamos colar na linha 5 de autenticacao-routing.module.ts. Faremos os imports dos três componentes e organizá-los, deixando uma linha vazia na linha 3:
+
+import { RouterModule, Routes } from "@angular/router";
+import { NgModule } from "@angular/core";
+
+import { authGuard } from "./auth.guard";
+import { CadastroComponent } from "./cadastro/cadastro.component";
+import { LoginComponent } from "./login/login.component";
+import { PerfilComponent } from "./perfil/perfil.component";
+
+const routes: Routes = [
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'cadastro',
+    component: CadastroComponent
+  },
+  {
+    path: 'perfil',
+    component: PerfilComponent,
+    canActivate: [authGuard]
+  },
+];
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports:[RouterModule]
+})
+export class AutenticacaoRoutingModule { }
+COPIAR CÓDIGO
+Agora essas rotas não são mais responsabilidade do arquivo de rotas principal e sim do arquivo de rotas da autenticação.
+
+Importando o arquivo de rotas de autenticacao
+Vamos abrir o autenticacao.module.ts para importar o módulo de rotas nele. Então, na linha 22, dentro do array de imports, vamos importar o AutenticacaoRoutingModule.
+
+autenticacao.module.ts
+imports: [
+    CommonModule,
+    SharedModule,
+    MaterialModule,
+    ReactiveFormsModule,
+    AutenticacaoRoutingModule
+],
+COPIAR CÓDIGO
+Vamos retornar à aplicação no navegador.
+
+Clicando em "Cadastre-se" e em "Login", nada acontece ainda. Mas se digitarmos manualmente o caminho /login na URL, o componente aparece. O mesmo vale para o componente de cadastro.
+
+Isso significa que precisamos, na verdade, corrigir o router link, que é quem está realizando esse redirecionamento. Vamos voltar no VS Code, e vamos fazer isso utilizando uma boa prática do Angular: o Lazy Loading.
+
+Lazy Loading
+Vamos entender essa boa prática com uma analogia. Imagine que você é um estudante em uma sala de aula, e você tem um armário nessa sala onde guarda todo o seu material. Cadernos, livros, régua, lápis, tinta, tudo o que você precisa.
+
+Antes do início da aula, você pega todo o material e leva para a sua carteira, mesmo que você não vá precisar de tudo durante aquela aula. E por conta dessa correria e de levar tantas coisas, acaba demorando para deixar tudo pronto, de fato, para o início da aula.
+
+Será que não seria mais eficaz levar só o material realmente necessário, e caso fosse preciso ter acesso a algum material adicional, carregar esse material sob demanda? É este o processo de Lazy Loading!
+
+No Lazy Loading, vamos escolher alguns módulos da aplicação para serem carregados conforme a demanda. Ou seja, o pacote inicial não ficará tão grande, porque nem tudo será carregado no início.
+
+Podemos utilizar essa boa prática, por exemplo, no módulo de autenticação. Isso porque uma pessoa, quando acessa a Jornada Milhas, pode fazer uma busca, mas nem sempre vai optar pelo cadastro ou login, e por vezes apenas fará uma busca, sem autenticação.
+
+Então, esse módulo separado de autenticação não precisa ser carregado logo no início. Isso otimizará a aplicação e o carregamento inicial será mais rápido.
+
+Então, vamos entender como implementar isso a seguir.
+
+@@07
+Implementando o Lazy Loading
+
+Para implementar o Lazy Loading, vamos criar um novo objeto com uma rota no app-routing.module.ts. Na linha 11, abriremos chaves e criaremos um novo path para redirecionar para a nova rota.
+Mas, antes disso, vamos abrir o terminal com "Ctrl + J" para observar algo. Quando a aplicação é carregada, o pacote inicial também é carregado e, no terminal, aparece o Initial Chunk Files, que seria o pacote inicial carregado quando a aplicação sobe. Quando implementarmos o Lazy Loading, isso mudará.
+
+Na linha 12, criaremos um novo path. Entre aspas simples, passaremos 'auth', de autenticação.
+
+Implementando o Lazy Loading
+Agora, precisamos implementar a sintaxe do Lazy Loading. Para isso, acessaremos a documentação do Angular.
+
+Na seção de Melhores Práticas ("Best Practices"), encontramos o Lazy Loading, com uma explicação e exemplo de sua sintaxe. Na constante de rotas, passa-se o path e utiliza-se uma função chamada loadChildren. Copiaremos esse exemplo e colaremos na linha 13.
+
+Essa função não carregará o módulo diretamente, mas carregará a rota filha. Além disso, ela está utilizando o import do JavaScript para importar o módulo. Substituiremos items por autenticacao no caminho em import, que é o nome do nosso módulo. Dentro da pasta autenticacao, acessaremos autenticacao.module .
+
+Esse import retornará uma promise e, quando essa promise for resolvida, o módulo será carregado. Passaremos então o AutenticacaoModule para cá também.
+
+app-routing.module.ts
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./autenticacao/autenticacao.module').then(m => m.AutenticacaoModule)
+  },
+// código omitido
+COPIAR CÓDIGO
+Feito isso, verificaremos agora se algo mudou no terminal, pressionando "Ctrl + J". O mesmo pacote inicial, Initial Chunk Files, continua sendo carregado.
+
+E por que isso? Porque no app.module.ts, no array de imports, o módulo de autenticação está sendo carregado. Tudo que é carregado no app.module é inicializado e carregado por padrão desde o início. Por isso que o Lazy Loading não está funcionando, apesar de termos feito a sintaxe.
+
+Removeremos, então a linha 26, que contém AutenticacaoModule, pois o módulo de autenticação não será carregado no app.module. E também removeremos a linha 13, que importa AutenticacaoModule.
+
+Acessando o terminal novamente, vamos parar a aplicação com "Ctrl + C" e executar novamente com o ng serve para verificar se o pacote já foi carregado sob demanda.
+
+Agora, sim! Temos no terminal o pacote inicial e logo abaixo dele temos os Lazy Chunk Files , que é justamente esse módulo que será carregado sob demanda, de forma preguiçosa. No nosso caso, é o autenticacao-module.
+
+Isso significa que conseguimos implementar o Lazy Loading!
+
+Agora, ao clicar em "Cadastre-se" ou "Login" na aplicação, ainda não funciona. Isso porque precisamos fazer um ajuste no routerLink.
+
+Ajustando os links de roteamento
+Vamos voltar ao VS Code e acessar o arquivo header.component.html. No routerLink da linha 11, adicionaremos o auth antes do /perfil. O mesmo na linha 17: auth/cadastro. Na linha 18, auth/login.
+
+header.component.html
+<ng-container *ngIf="user$ | async as pessoaUsuaria; else login">
+    <a routerLink="auth/perfil">
+        <img src="assets/icones/user.png" alt="Ícone da pessoa usuária">
+    </a>
+    <button mat-stroked-button color="primary" (click)="logout()">SAIR</button>
+</ng-container>
+<ng-template #login>
+    <button routerLink="auth/cadastro" mat-raised-button color="primary">CADASTRE-SE</button>
+    <button routerLink="auth/login" mat-stroked-button>LOGIN</button>
+</ng-template>
+COPIAR CÓDIGO
+Agora, voltando na aplicação, quando clicamos em "Login" ou "Cadastre-se", a página é redirecionada para a página de formulário em questão, seja para login ou cadastro. Então, está tudo funcionando!
+
+Mas há alguns outros lugares na aplicação onde também estamos utilizando esse roteamento. Isso ficará como prática para você modificar.
+
+@@07
+Implementando o Lazy Loading
+
+Para implementar o Lazy Loading, vamos criar um novo objeto com uma rota no app-routing.module.ts. Na linha 11, abriremos chaves e criaremos um novo path para redirecionar para a nova rota.
+Mas, antes disso, vamos abrir o terminal com "Ctrl + J" para observar algo. Quando a aplicação é carregada, o pacote inicial também é carregado e, no terminal, aparece o Initial Chunk Files, que seria o pacote inicial carregado quando a aplicação sobe. Quando implementarmos o Lazy Loading, isso mudará.
+
+Na linha 12, criaremos um novo path. Entre aspas simples, passaremos 'auth', de autenticação.
+
+Implementando o Lazy Loading
+Agora, precisamos implementar a sintaxe do Lazy Loading. Para isso, acessaremos a documentação do Angular.
+
+Na seção de Melhores Práticas ("Best Practices"), encontramos o Lazy Loading, com uma explicação e exemplo de sua sintaxe. Na constante de rotas, passa-se o path e utiliza-se uma função chamada loadChildren. Copiaremos esse exemplo e colaremos na linha 13.
+
+Essa função não carregará o módulo diretamente, mas carregará a rota filha. Além disso, ela está utilizando o import do JavaScript para importar o módulo. Substituiremos items por autenticacao no caminho em import, que é o nome do nosso módulo. Dentro da pasta autenticacao, acessaremos autenticacao.module .
+
+Esse import retornará uma promise e, quando essa promise for resolvida, o módulo será carregado. Passaremos então o AutenticacaoModule para cá também.
+
+app-routing.module.ts
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./autenticacao/autenticacao.module').then(m => m.AutenticacaoModule)
+  },
+// código omitido
+COPIAR CÓDIGO
+Feito isso, verificaremos agora se algo mudou no terminal, pressionando "Ctrl + J". O mesmo pacote inicial, Initial Chunk Files, continua sendo carregado.
+
+E por que isso? Porque no app.module.ts, no array de imports, o módulo de autenticação está sendo carregado. Tudo que é carregado no app.module é inicializado e carregado por padrão desde o início. Por isso que o Lazy Loading não está funcionando, apesar de termos feito a sintaxe.
+
+Removeremos, então a linha 26, que contém AutenticacaoModule, pois o módulo de autenticação não será carregado no app.module. E também removeremos a linha 13, que importa AutenticacaoModule.
+
+Acessando o terminal novamente, vamos parar a aplicação com "Ctrl + C" e executar novamente com o ng serve para verificar se o pacote já foi carregado sob demanda.
+
+Agora, sim! Temos no terminal o pacote inicial e logo abaixo dele temos os Lazy Chunk Files , que é justamente esse módulo que será carregado sob demanda, de forma preguiçosa. No nosso caso, é o autenticacao-module.
+
+Isso significa que conseguimos implementar o Lazy Loading!
+
+Agora, ao clicar em "Cadastre-se" ou "Login" na aplicação, ainda não funciona. Isso porque precisamos fazer um ajuste no routerLink.
+
+Ajustando os links de roteamento
+Vamos voltar ao VS Code e acessar o arquivo header.component.html. No routerLink da linha 11, adicionaremos o auth antes do /perfil. O mesmo na linha 17: auth/cadastro. Na linha 18, auth/login.
+
+header.component.html
+<ng-container *ngIf="user$ | async as pessoaUsuaria; else login">
+    <a routerLink="auth/perfil">
+        <img src="assets/icones/user.png" alt="Ícone da pessoa usuária">
+    </a>
+    <button mat-stroked-button color="primary" (click)="logout()">SAIR</button>
+</ng-container>
+<ng-template #login>
+    <button routerLink="auth/cadastro" mat-raised-button color="primary">CADASTRE-SE</button>
+    <button routerLink="auth/login" mat-stroked-button>LOGIN</button>
+</ng-template>
+COPIAR CÓDIGO
+Agora, voltando na aplicação, quando clicamos em "Login" ou "Cadastre-se", a página é redirecionada para a página de formulário em questão, seja para login ou cadastro. Então, está tudo funcionando!
+
+Mas há alguns outros lugares na aplicação onde também estamos utilizando esse roteamento. Isso ficará como prática para você modificar.
+
+@@08
+Mão na massa: ajustando a rota
+
+Após implementar o lazy loading para o módulo de autenticação, foi preciso ajustar os links do cabeçalho para que o routerLink pudesse redirecionar corretamente para os componentes de cadastro, login e perfil, como visto no vídeo anterior.
+Mas é necessário ajustar também outros locais, além do cabeçalho, onde esse redirecionamento está sendo feito. Vamos lá!
+
+Iniciando os ajustes, na tela de login, temos um redirecionamento para a tela de cadastro que precisa ser ajustado.
+1. No arquivo login.component.html, adicione /auth antes de /cadastro, assim:
+
+<p>Ainda não possui conta?
+   <a routerLink="/auth/cadastro">
+<strong><u>Clique aqui para se cadastrar!</u>
+</strong>
+   </a>
+</p>
+COPIAR CÓDIGO
+2. No arquivo de guarda de rotas, auth.guard.ts, adicione auth antes de /login no método navigate, assim:
+
+if(userService.estaLogado()) {
+    return true;
+  } else {
+    router.navigate(['auth/login']);
+    return false;
+  }
+COPIAR CÓDIGO
+3. No arquivo cadastro.component.ts, adicione auth antes de /login no método cadastrar, assim:
+
+cadastrar() {
+    //código omitido
+    this.router.navigate(['auth/login']);
+    //código omitido
+}
+COPIAR CÓDIGO
+4. No arquivo perfil.component.ts, adicione auth antes de /login no método deslogar, assim:
+
+deslogar() {
+    this.userService.logout();
+    this.router.navigate(['auth/login']);
+}
+COPIAR CÓDIGO
+5. No arquivo header.component.ts, adicione auth antes de /login no método logout, assim:
+
+  logout() {
+    this.userService.logout();
+    this.router.navigate(['auth/login'])
+  }
+COPIAR CÓDIGO
+Pronto, agora as rotas estão ajustadas e podemos continuar!
+
+@@09
+Para saber mais: Lazy Loading no Angular
+
+Você pode acessar o artigo que escrevi sobre Lazy loading no angular para saber mais sobre as vantagens de utilizá-lo, como implementar esta técnica na sua aplicação e como verificar o seu funcionamento.
+
+https://www.alura.com.br/artigos/como-lazy-loading-pode-melhorar-desempenho-aplicacao-angular?_gl=1*zw7q5s*_ga*MTgwMzIzMjk2Ni4xNjg4ODE5OTcz*_ga_1EPWSW3PCS*MTcwOTg0OTM4My4yMzAuMS4xNzA5ODU0ODYzLjAuMC4w*_fplc*MUZhTyUyRm1VJTJCcVRNcDhqSDA4bjBDZiUyRkc4Qmo3OUt4V0d3WnNmRk9qaU9ub1VqNmcwOVllR0g3T3BSeUNsNWVtZ0ViVHZGWTVXV1BheWlHVDhOTDA3ZmJZNm4lMkZhazIwdzUlMkZtJTJGTFlqVkgzcW1lOW9zc3E4Y0s1NHNjTENoMGF3JTNEJTNE
+
+@@10
+Carregamento sob demanda
+
+Você está trabalhando em um projeto Angular de grande escala e deseja melhorar o desempenho da aplicação, reduzindo o tempo de carregamento inicial. Você está considerando a implementação do lazy loading para carregar módulos de funcionalidade apenas quando necessário.
+// Exemplo de configuração de roteamento com Lazy Loading em Angular
+const routes: Routes = [
+  {
+    path: 'funcionalidade',
+    loadChildren: () =>
+      import('./funcionalidade/funcionalidade.module').then(
+        (m) => m.FuncionalidadeModule
+      ),
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+COPIAR CÓDIGO
+Assinale a alternativa que contém a definição de lazy loading em Angular e como ele pode beneficiar o desempenho da aplicação.
+
+Lazy loading é uma técnica que carrega automaticamente todos os módulos da aplicação durante o carregamento inicial para melhorar o desempenho. Isso garante que todos os recursos estejam prontos para uso imediato.
+ 
+O Lazy loading não carrega automaticamente todos os módulos da aplicação no início.
+Alternativa correta
+Lazy loading é uma técnica que adia o carregamento de módulos de funcionalidade até que eles sejam realmente necessários, o que pode reduzir significativamente o tempo de carregamento inicial da aplicação.
+ 
+Lazy loading é uma técnica que adia o carregamento de módulos de funcionalidade até que sejam necessários, reduzindo o tempo de carregamento inicial da aplicação.
+Alternativa correta
+Lazy loading é uma técnica que desativa completamente o carregamento de módulos de funcionalidade, tornando a aplicação mais rápida, mas limitando a funcionalidade disponível.
+ 
+Alternativa correta
+Lazy loading é uma técnica usada apenas para carregar imagens e recursos de mídia em segundo plano, não afetando o carregamento de módulos Angular.
+
+@@11
+Mão na massa: implementando roteamento e Lazy Loading no módulo de busca
+
+Agora é sua vez de praticar!
+Crie o arquivo de rotas para o módulo de busca e implemente o lazy loading para que esse módulo seja carregado sob demanda!
+
+Para criar o módulo de rotas, siga os passos a seguir:
+1. Clique com o botão direito dentro da pasta busca e selecione a opção New File (Novo arquivo);
+
+2. Nomeie o arquivo de acordo com a convenção: busca-routing.module.ts;
+
+Esse arquivo terá a seguinte estrutura final:
+import { RouterModule, Routes } from "@angular/router";
+import { NgModule } from "@angular/core";
+
+import { BuscaComponent } from "./busca.component";
+
+const routes: Routes = [
+  {
+    path: '',
+    component: BuscaComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class BuscaRoutingModule { }
+COPIAR CÓDIGO
+3. Faça a Importação do arquivo de rotas no módulo de busca, assim:
+
+//importações omitidas
+import { BuscaRoutingModule } from "./busca-routing.module";
+
+@NgModule({
+  declarations: [
+    //código omitido
+  ],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    SharedModule,
+    ReactiveFormsModule,
+    BuscaRoutingModule
+  ],
+  exports: [
+    //código omitido
+  ]
+})
+export class BuscaModule { }
+COPIAR CÓDIGO
+Para implementar o lazy loading, siga os passos a seguir:
+
+4. No arquivo app-routing.module.ts adicione a configuração do loadChildren.
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+//código omitido
+    {
+        path: 'busca',
+            loadChildren: () => import('./busca/busca.module').then(m => m.BuscaModule),
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes), HomeModule],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+COPIAR CÓDIGO
+5. Remova o BuscaModule do array de imports do app.module.ts para que ele não seja carregado inicialmente e o lazy loading funcione.
+
+6. Teste e veja no terminal se o módulo está sendo carregado sob demanda, da mesma forma que o módulo de autenticação como na imagem a seguir:
+
+Imagem do terminal integrado do VS Code mostrando os módulos de busca e autenticação de ao serem carregados através do lazy loading - carregamento sob demanda. Os módulos estão descritos abaixo da categoria: Lazy Chunck Files. Na frente do nome do módulo, está o tamanho dele: 79.05kB para o módulo de busca e 38.04kB para o de autenticação.
+
+@@12
+Rota não encontrada
+
+Agora, já configuramos o roteamento dos novos módulos. Contudo, o que ocorre quando tentamos acessar uma rota que não existe?
+Ao acessar uma URL inválida, notamos que somente o rodapé e o cabeçalho parecem, enquanto a página permanece em branco. Essa não é a experiência ideal. O indicado é que as pessoas usuárias sejam levadas a uma página que avise sobre inexistência da rota, apresentando também um link para redirecionamento à página inicial. E isso é exatamente o que faremos neste vídeo.
+
+No Figma do projeto, temos uma página para erro com uma foto e o aviso "Opa! Página não encontrada! Retorne à tela inicial.". Vamos implementá-la na nossa aplicação.
+
+Página de erro
+Voltaremos ao VS Code. Agora, com a aplicação já organizada em módulos, a adição de uma nova funcionalidade torna-se muito mais simples. Utilizaremos o Angular CLI para isso.
+
+Vamos abrir o terminal com "Ctrl + J" e encerrar a aplicação com "Ctrl + C". Criaremos um novo módulo chamado "erro" na pasta "core" do nosso projeto, com o comando ng g m core/erro. Para também gerar simultaneamente o arquivo de rotas, passaremos a flag --routing.
+
+ng g m core/erro --routing
+COPIAR CÓDIGO
+Após pressionar "Enter", a pasta de erro e o arquivo de rotas erro-routing.module.ts já foram criados, além do módulo erro.module.ts. Inclusive, o arquivo de rotas já foi importado para dentro do módulo.
+
+Criaremos agora um componente para representar a página não encontrada. Esse componente será criado dentro do módulo de erro e será chamado de pagina-nao-encontrada. Faremos isso por meio do seguinte comando
+
+ng g c core/erro/pagina-nao-encontrada
+COPIAR CÓDIGO
+Esse novo componente já foi criado e declarado no módulo. Esse componente não está presente nas declarations do app.module, então não precisamos apagar nada, pois ele já está automaticamente declarado dentro do módulo de erro.
+
+No CSS da página não encontrada, colaremos o código que será responsável pelo alinhamento das imagens e do parágrafo:
+
+pagina-nao-encontrada.component.scss
+section {
+  p {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+    color: #000000;
+  }
+  a {
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6750A4;
+  }
+  app-container {
+    padding: 112px 0 112px 0;
+  }
+  figure {
+    display: flex;
+    justify-content: center;
+  }
+}
+COPIAR CÓDIGO
+Já no HTML colaremos o template, que é bastante simples:
+
+pagina-nao-encontrada.component.html
+<section>
+  <app-banner
+    src="assets/imagens/banner-pagina-nao-encontrada.png"
+    alt="Banner da tela de erro - página não encontrada">
+  </app-banner>
+  <app-container>
+    <p>Ops! Página não encontrada!
+      <a routerLink="/home">Retorne à tela inicial</a>
+    </p>
+    <figure>
+      <img
+      src="assets/imagens/pagina-nao-encontrada.png"
+      alt="Ilustração de mulher com binóculos e um círculo roxo com número 404">
+    </figure>
+  </app-container>
+  <app-banner
+    src="assets/imagens/banner-homepage-rodape.png"
+    alt="Banner de rodapé com imagem de homem sentado numa montanha">
+  </app-banner>
+</section>
+COPIAR CÓDIGO
+Nesse template, temos uma section e dentro dela o app-banner, um componente que criamos em aulas anteriores. Esse será o banner da tela de erro.
+
+Utilizaremos também o app-container com o parágrafo "Ops! Página não encontrada!". Teremos também uma tag a com routerLink para /home, permitindo a volta à tela inicial. Além disso, teremos imagem de uma pessoa com binóculos no centro da tela e o banner de rodapé.
+
+Agora, precisamos importar o módulo de erro dentro do app.module.ts para permitir o acesso a ele. Importaremos o módulo de erro na linha 27:
+
+app.module.ts
+imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule,
+    MaterialModule,
+    HomeModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    ErroModule
+],
+COPIAR CÓDIGO
+Rotas de erro
+Vamos configurar as rotas agora. Acessaremos o error-routing.module e, na linha 5 (dentro do array de Routes), criaremos um objeto com chaves. Na linha 6, digitaremos o path: 'pagina-nao-encontrada', e na linha 7 o component, que será o PaginaNaoEncontradaComponent.
+
+error-routing.module.ts
+const routes: Routes = [
+  {
+    path: 'pagina-nao-encontrada',
+    component: PaginaNaoEncontradaComponent
+  }
+];
+COPIAR CÓDIGO
+Agora que realizamos essa configuração no módulo de erro, vamos voltar ao app-routing.module.ts, o arquivo de rotas. Copiaremos as linhas 5 a 9 para duplicar o objeto, logo no início do array de Routes, e criaremos uma rota coringa.
+
+Essa rota redirecionará o usuário para a página não encontrada, quando o roteador do Angular não encontrar correspondência com nenhuma outra rota.
+
+O path será '**', entre aspas simples, redirecionando para a rota de página não encontrada pela propriedade redirectTo, e o pathMatch também será full.
+
+app-routing.module.ts
+{
+    path: '**',
+    redirectTo: '/pagina-nao-encontrada',
+    pathMatch: 'full'
+}
+COPIAR CÓDIGO
+Por fim, vamos executar a aplicação com o seguinte comando no terminal. Ao criar componentes e módulos, é sempre indicado parar o CLI e reiniciar, e depois executar novamente a aplicação com o ng serve no terminal para poder testar.
+
+Após fazer isso, o terminal indica um erro no módulo de erro: nós não estamos conseguindo acessar o app-banner. Portanto, vamos conferir o que aconteceu no arquivo erro.module.
+
+O que ocorre é que estamos tentando acessar o app-banner, que está no módulo shared, no módulo de erro. Como os módulos são independentes, já sabemos que precisamos importar para usar seus componentes.
+
+Assim, no erro.module, na linha 15, vamos importar o SharedModule. Também importaremos o RouterModule, outro módulo necessário para o módulo de erro, pois o módulo de roteamento poderá redirecionar a pessoa para a página inicial da aplicação.
+
+erro.module.ts
+imports: [
+    CommonModule,
+    ErroRoutingModule,
+    SharedModule,
+    RouterModule
+]
+COPIAR CÓDIGO
+Também precisamos importar ambos os componentes dentro do arquivo.
+
+Vamos testar novamente a nossa aplicação no navegador.
+
+Agora, a página de aviso de página não encontrada já está aparecendo!
+
+Mas, ao clicar no logo da Jornada no cabeçalho, no botão "Cadastre-se" ou no "Login" ainda permanecemos nessa página não encontrada.
+
+O que será que está ocorrendo? Vamos voltar ao VS Code e verificar no app-routing.module.
+
+Quando nós configuramos uma rota coringa, o roteador do Angular redirecionará para a página não encontrada se nenhuma rota anterior for encontrada. Se essa rota coringa é a primeira que colocamos no array de rotas, é por isso que esse erro ocorre. Evitamos esse erro colocando a rota coringa como a última rota do array.
+
+Além disso, é uma boa prática deixar as rotas mais específicas primeiro, e as rotas mais genéricas no final. Sendo assim, deixaremos o path vazio mais abaixo, antes da rota coringa. Teremos, então:
+
+app-routing.module.ts
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./autenticacao/autenticacao.module').then(m => m.AutenticacaoModule)
+  },
+  {
+    path: 'busca',
+    loadChildren: () => import('./busca/busca.module').then(m => m.BuscaModule)
+  },
+  {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '/pagina-nao-encontrada',
+    pathMatch: 'full'
+  }
+];
+COPIAR CÓDIGO
+Agora, ao clicar no logo da Jornada no cabeçalho do site no navegador, a página inicial é carregada corretamente, assim como clicando em "Cadastre-se" e "Login".
+
+Se tentarmos acessar uma rota que não existe, somos redirecionados para a página não encontrada. Porém, o link de retorno à tela inicial não está funcionando.
+
+Para resolver isso, voltaremos ao VS Code para resolver. Uma das formas de fazer isso é no routerLink do HTML da página não encontrada, removendo o /home e deixando o routerLink apenas com '/' para voltar à tela inicial.
+
+pagina-nao-encontrada.component.html
+<p>Ops! Página não encontrada!
+    <a routerLink="/">Retorne à tela inicial</a>
+</p>
+COPIAR CÓDIGO
+Pronto, resolvemos tudo!
+
+Agora que as rotas já estão configuradas, aprenderemos na próxima aula como gerenciar os erros na aplicação.
+
+@@13
+O que aprendemos?
+
+Nessa aula, você aprendeu como:
+Criar arquivos de roteamento para módulos de funcionalidade;
+Organizar as rotas no AppRoutingModule;
+Implementar lazy loading e carregar módulos sob demanda;
+Lidar com rotas não encontradas na aplicação.
