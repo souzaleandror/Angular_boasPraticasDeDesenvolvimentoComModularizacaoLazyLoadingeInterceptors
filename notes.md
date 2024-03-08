@@ -1901,3 +1901,499 @@ Criar arquivos de roteamento para módulos de funcionalidade;
 Organizar as rotas no AppRoutingModule;
 Implementar lazy loading e carregar módulos sob demanda;
 Lidar com rotas não encontradas na aplicação.
+
+#### 08/03/2024
+
+@04-Gerenciamento de erros
+
+@@01
+Projeto da aula anterior
+PRÓXIMA ATIVIDADE
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
+
+https://github.com/alura-cursos/3413-jornada-milhas/archive/refs/heads/aula-3.zip
+
+https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-3
+
+@@02
+Criando um Interceptor
+
+Na aula passada, nós criamos os arquivos de rota dos módulos e um novo módulo para começar lidar com os erros da aplicação. Esse módulo foi responsável pela adição da "página não encontrada".
+É muito importante lidarmos com os erros da aplicação de uma forma consistente e centralizada, dado que existem vários tipos de erros que podem ocorrer. Um deles, por exemplo, é o erro de servidor indisponível.
+
+Vamos fazer um teste. No terminal, vamos parar o back-end com o comando "Ctrl +C" para descobrirmos o que acontece. Retornando ao navegador e recarregando a página inicial do Jornada Milhas no navegador, não aparecem mais os cartões de promoções e de depoimentos que eram fornecidos pelo back-end, assim como os estados. Para a pessoa usuária, a aplicação está quebrada, mas ela não compreende exatamente o que ocorreu.
+
+Se abrirmos o terminal, pressionando "Ctrl + Shift +J", aparecem vários erros, por exemplo, o HttpErrorResponse, com diversas informações, mas que só faz sentido para as pessoas desenvolvedoras. É importante que esse feedback também aparece para as pessoas usuárias, e é exatamente isso que vamos começar a construir nessa aula: aprender a gerenciar os erros da aplicação.
+
+Uma das formas para implementarmos o gerenciamento de erros é utilizando o Interceptor, que é uma ferramenta essencial do Angular. Esse Interceptor já foi usado na aplicação, especificamente no módulo de autenticação. No autenticacao.interceptor.ts temos um Interceptor de autenticação, onde adicionamos informações à requisição antes dela ser enviada ao servidor.
+
+No caso do tratamento de erros, o Interceptor terá uma função contrária. Ele não lidará com a requisição antes dela alcançar o servidor, e sim com a resposta dessa requisição HTTP. Sendo assim, criaremos um novo Interceptor dentro do módulo de erro.
+
+No VS Code, abriremos o terminal com o atalho "Ctrl + J". Ao clicarmos no terminal, pressionaremos "Ctrl + C" para pararmos a aplicação. Em seguida, escreveremos o comando ng g interceptor core/erro/erros --skip-tests. Passamos o caminho de onde ele deve ser criado, ou seja, em "core > erro". O nome do Interceptor será erros e passamos a opção --skip-tests para não gerarmos o arquivo de testes.
+
+Atenção: Nesse caso não devemos abreviar interceptor para i, ou criaremos uma interface e não um Interceptor.
+Ao pressionarmos "Enter", o Interceptor é criado. Em seguida, ainda no terminal, escreveremos ng serve para executar a aplicação e podemos fechar o terminal. Agora, ao acessarmos "core > erro", encontramos o Interceptor de erros: erros.interceptor.ts. Vamos abrir esse arquivo.
+
+Esse Interceptor é uma classe de serviço do Angular que possui o decorator @Injectable na linha 10, indicando que essa classe pode ser injetada na aplicação. O Interceptor implementa a interface HttpInterceptor, que possui o método intercept(). Esse método receberá como parâmetro a requisição e um manipulador, retornando-nos um Observable.
+
+Para simplificar a explicação, vamos imaginar um cenário em que estamos indo aos correios para enviar uma encomenda. Nos correios, a pessoa atendente adiciona algum selo ou etiqueta especial na encomenda antes de enviá-la. Nesse caso, a atendente está agindo como um Interceptor, pois adiciona informações na encomenda. Da mesma forma, no Angular, o Interceptor adiciona informações à requisição antes dela ser enviada, como no caso do Interceptor de autenticação.
+
+Agora, vamos pensar num cenário onde uma pessoa dos correios vem até nossa casa entregar a encomenda. Antes de entregá-la, ela fará uma verificação para verificar se não houve danos na embalagem ou algum erro. Essa pessoa também age como Interceptor, neste caso gerenciando erros. Da mesma forma, no Angular, o Interceptor gerencia os erros da aplicação, verificando se houve algum erro. Se houver, seremos capazes de lidar com esses erros adicionando uma lógica dentro do Interceptor.
+
+Deixarei um Para Saber Mais para aprofundar seus conhecimentos sobre o Interceptor e com alguns casos de uso, tanto do Interceptor de requisição como do Interceptor de resposta.
+
+@@03
+Para saber mais: Interceptor no Angular
+PRÓXIMA ATIVIDADE
+
+Interceptors em Angular são mecanismos poderosos para "interceptar" e "observar" solicitações HTTP antes que sejam enviadas para o servidor e antes que as respostas retornem ao código que originou a chamada HTTP. Isso oferece uma maneira flexível e modular de adicionar funcionalidades comuns a todas as solicitações HTTP em uma aplicação Angular.
+Casos de Uso dos Interceptors:
+
+Modificar solicitações antes do envio ao servidor:
+Adicionar cabeçalhos HTTP personalizados à solicitação: Os interceptors podem injetar cabeçalhos, como tokens de autenticação ou informações de rastreamento, em todas as solicitações, garantindo consistência e segurança;
+Anexar tokens de autenticação às solicitações: Isso é útil para garantir que todas as solicitações feitas pela aplicação estejam autenticadas, sem a necessidade de modificar manualmente cada chamada;
+Realizar transformações nos dados da solicitação: Os interceptores podem modificar os dados da solicitação, como formatos de dados, antes que sejam enviados ao servidor;
+Qualquer manipulação prévia necessária: Você pode realizar qualquer lógica de preparação ou validação antes que a solicitação seja despachada, tornando o código de chamada mais limpo e focado em seu propósito principal.
+Observar a resposta antes de retornar ao código de chamada:
+Lidar com erros de forma consistente: Interceptors podem capturar erros de solicitação, como erros de rede ou status HTTP não esperados e apresentar mensagens de erro amigáveis ou executar ações específicas de tratamento de erros;
+Realizar transformações nos dados de resposta: Os interceptores permitem que você modifique os dados de resposta, como formatos de dados, para atender às necessidades da sua aplicação;
+Executar ações comuns: Interceptors podem ser usados para realizar ações comuns em todas as respostas, como mostrar indicadores de carregamento, registrar informações de log ou executar qualquer ação necessária para o feedback da pessoa usuária.
+Em resumo, interceptors são como "filtros" que podem ser aplicados globalmente a solicitações e respostas HTTP em uma aplicação Angular. Eles centralizam a lógica de manipulação de solicitações e respostas, promovendo a reutilização do código, a modularidade e a manutenção de um código limpo. Além disso, eles são uma ferramenta poderosa para adicionar funcionalidades como autenticação, tratamento de erros e outras tarefas comuns a todas as chamadas HTTP na sua aplicação Angular, melhorando a consistência e a segurança.
+
+Na documentação oficial você pode encontrar mais informações sobre como interceptar requisições e respostas e também sobre casos de uso dos interceptors.
+
+https://angular.io/guide/http-intercept-requests-and-responses
+
+https://angular.io/guide/http-interceptor-use-cases
+
+@@04
+Gerenciando erros na aplicação
+
+Agora, adicionaremos a lógica dentro do interceptor para que possamos capturar possíveis erros, verificar o tipo de erro e fornecer feedback para pessoa usuária. Como já criamos o interceptor, precisamos registrá-lo. Faremos isso dentro de app.module.ts.
+Abrindo esse arquivo, selecionaremos o código que temos dentro de providers, nas últimas linhas do arquivo, e pressionaremos "Alt + Shift + ↓", copiando esse código para as linhas abaixo. Além disso, após o fechamento de chaves do primeiro interceptor, adicionaremos uma vírgula. No novo código, o provide continuará sendo a classe HTTP_ INTERCEPTORS, mas useClass será o novo ErrosInterceptor. Concluído, já o importamos.
+
+// código omitido
+
+providers: [
+    {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AutenticacaoInterceptor,
+    multi: true
+    },
+    {
+    provide: HTTP_INTERCEPTORS,
+    useClass: ErrosInterceptor,
+    multi: true
+    }
+],
+COPIAR CÓDIGO
+Agora, posso fechar o app.module.ts e retornar para o erros.interceptor.ts. No intercept(), recebemos como parâmetro a requisição e o manipulador. Vamos tipar esses dois parâmetros. Para isso, selecionamos o unknown do request, pressionamos "Ctrl + D" para selecionar o unknow do next também, e escreveremos HTTPErrorResponse como o tipo.
+
+//código omitido
+
+intercept (
+    request: HttpRequest<HttpErrorResponse>,
+    next: HttpHandler): Observable<HttpEvent<HttpErrorResponse>> {
+        return next.handle(request);
+    })
+COPIAR CÓDIGO
+Como o retorno desse método intercept() é um Observable, vou utilizaremos alguns operadores do RxJS para manipularmos essa requisição. Sendo assim, no final do return adicionaremos um .pipe() fazermos o encadeamento dos operadores do RxJS. Usaremos catchError(), porque queremos capturar um erro. Nos parênteses, receberemos o error: HTTPErrorResponse. Criaremos uma arrow function para continuarmos adicionando a lógica.
+
+//código omitido
+
+intercept (
+    request: HttpRequest<HttpErrorResponse>,
+    next: HttpHandler): Observable<HttpEvent<HttpErrorResponse>> {
+        return next.handle(request).pipe(
+            catchError((error: HttpErrorResponse) => {
+                
+        });
+    })
+COPIAR CÓDIGO
+Precisamos retornar esse erro no final, então, antes de fechar chaves, escreveremos return throwError(), que é outro operador do RxJS. Nos parênteses, escreveremos outra arrow function, passando um new Error ('Ops, ocorreu um erro!'), ou seja, passamos a mensagem de erro.
+
+//código omitido
+
+intercept (
+    request: HttpRequest<HttpErrorResponse>,
+    next: HttpHandler): Observable<HttpEvent<HttpErrorResponse>> {
+        return next.handle(request).pipe(
+            catchError((error: HttpErrorResponse) => {
+                
+                return throwError (() => new Error('Ops, ocorreu um erro!'));
+        });
+    })
+COPIAR CÓDIGO
+Agora, adicionaremos a lógica dentro do catchError(). Começamos criando uma variável local que vai conter uma mensagem de texto que será mostrada para a pessoa usuária. Para isso codamos let errorMessage = 'Ocorreu um erro desconhecido.
+
+Então deixamos a mensagem padrão "Ocorreu um erro desconhecido", isso porque não vamos verificar todos os status de erro, mas utilizaremos alguns que fazem mais sentido para a aplicação. Caso nenhum desses erros verificados ocorra, a mensagem padrão que ficará é "Ocorreu um erro desconhecido".
+
+//código omitido
+
+return next.handle(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido';
+        
+        return throwError (() => new Error('Ops, ocorreu um erro!'));
+});
+COPIAR CÓDIGO
+Agora, faremos uma verificação do tipo de erro. Primeiro, verificaremos se o erro está acontecendo do lado da pessoa cliente ou do servidor. Para isso, na linha abaixo do errorMessage, escreveremos um if() e verificaremos o tipo do erro. Se error.error for uma instância de ErrorEvent, isso indica que esse erro está acontecendo do lado do cliente, e não é um erro do tipo httpErrorResponse. Nesses casos, a mensagem que aparecerá será `Erro do cliente: ${error.error.message}'`.
+
+//código omitido
+
+return next.handle(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido';
+        
+        if (error.error instanceof ErrorEvent) {
+            errorMessage = `Erro do cliente: ${error.error.message}`;
+        }
+        
+        return throwError (() => new Error('Ops, ocorreu um erro!'));
+});
+COPIAR CÓDIGO
+Caso não seja um erro do lado do cliente, verificaremos o status de erro do servidor. Então, após o fechamento de chaves do if(), adicionaremos um else if(error.status === 404) para verificarmos o status 404. Se for esse erro, a errorMessage será "Recurso não encontrado".
+
+//código omitido
+
+return next.handle(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido';
+        
+        if (error.error instanceof ErrorEvent) {
+            errorMessage = `Erro do cliente: ${error.error.message}`;
+        } else if (error.status === 404) {
+            errorMessage = 'Recurso não encontrado';
+        
+        return throwError (() => new Error('Ops, ocorreu um erro!'));
+});
+COPIAR CÓDIGO
+Além do erro 404, verificaremos os status de erro 500, que é um erro do servidor, e 401, para acesso não autorizado. As mensagens serão, sucessivamente, "Erro interno no servidor" e "Você não está autorizado a acessar este recurso". Caso não caia em nenhuma dessas condições, a mensagem padrão será "Ocorreu um erro desconhecido".
+
+return next.handle(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido';
+
+        if (error.error instanceof ErrorEvent) {
+            // Erro do lado do cliente, como uma rede interrompida
+            errorMessage = `Erro do cliente: ${error.error.message}`;
+        } else if (error.status === 404) {
+            // Recurso não encontrado (erro 404)
+            errorMessage = 'Recurso não encontrado';
+        } else if (error.status === 500) {
+            // Erro interno do servidor (erro 500)
+            errorMessage = 'Erro interno do servidor';
+        } else if (error.status === 401) {
+            // Não autorizado (erro 401)
+            errorMessage = 'Você não está autorizado a acessar este recurso';
+        }
+        
+        console.error( error);
+        console.error(errorMessage);
+        
+        return throwError (() => new Error('Ops, ocorreu um erro!'));
+    });
+COPIAR CÓDIGO
+Para visualizarmos se isso está funcionando, adicionamos um console.error(error) e um console.error(errorMessage), para recebermos o erro e a mensgem. Agora, vamos simular um erro para testar se o interceptor está funcionando.
+
+No menu Explorer, na lateral esquerda do VS Code, dentro acessaremos "core > unidade-federativa.service.ts. No método requestEstados() , mais ao final do código, excluiremos duas letras de /estados, deixando como /estad.
+
+//código omitido
+private requestEstados(): Observable<UnidadeFederativa[]> {
+    return this.http.get<UnidadeFederativa[]>(`${this.apiUrl}/estad`);
+}
+COPIAR CÓDIGO
+De volta à aplicação, abriremos o console, onde observamos o erro "Recurso não encontrado" e o status 404. Isso indica que o interceptor já está funcionando, mas ainda precisamos fornecer um feedback visual para o usuário, que será implementado em breve.
+
+@@05
+Interceptando requisições
+PRÓXIMA ATIVIDADE
+
+Você está desenvolvendo uma aplicação Angular que precisa exibir uma mensagem de loading sempre que uma requisição HTTP estiver em andamento. Para implementar isso de forma eficiente, você decide usar um interceptor com o código a seguir:
+import { Injectable } from '@angular/core';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+} from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { LoadingService } from './loading.service';
+
+@Injectable()
+export class LoadingInterceptor implements HttpInterceptor {
+  constructor(private loadingService: LoadingService) {}
+
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    this.loadingService.showLoading();
+    return next.handle(request).pipe(
+      finalize(() => {
+        this.loadingService.hideLoading();
+      })
+    );
+  }
+}
+COPIAR CÓDIGO
+Abaixo está o código do serviço LoadingService que o interceptor LoadingInterceptor está consumindo:
+
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoadingService {
+  private isLoading = new BehaviorSubject<boolean>(false);
+
+  constructor() { }
+
+  showLoading() {
+    this.isLoading.next(true);
+  }
+
+  hideLoading() {
+    this.isLoading.next(false);
+  }
+
+  getLoadingStatus() {
+    return this.isLoading.asObservable();
+  }
+}
+COPIAR CÓDIGO
+Qual é o propósito do interceptor LoadingInterceptor no código acima e como ele melhora a experiência de uso da aplicação?
+
+O interceptor LoadingInterceptor é utilizado para bloquear todas as requisições HTTP feitas pela aplicação, garantindo que nenhum dado seja transmitido pela rede. Isso protege a aplicação contra possíveis ataques de segurança, melhorando a experiência.
+ 
+Alternativa correta
+O interceptor LoadingInterceptor é usado para adicionar um atraso artificial em todas as requisições HTTP, simulando um carregamento lento. Isso proporciona uma experiência mais realista e imersiva, tornando a aplicação mais envolvente.
+ 
+Alternativa correta
+O interceptor LoadingInterceptor intercepta todas as requisições HTTP e exibe uma mensagem de loading enquanto a requisição está em andamento. Isso proporciona uma experiência mais responsiva, indicando visualmente quando as operações de rede estão ocorrendo.
+ 
+Essa abordagem permite que as pessoas saibam que a aplicação está funcionando e aguardando uma resposta do servidor, melhorando assim a experiência de uso da aplicação. É uma prática comum em interfaces para fornecer feedback visual durante operações demoradas, tornando a aplicação mais amigável e informativa.
+Alternativa correta
+O interceptor LoadingInterceptor é responsável por identificar automaticamente o tipo de conteúdo das respostas das requisições HTTP e ajustar dinamicamente o layout da aplicação para melhorar a legibilidade do texto. Isso melhora a experiência ao garantir que o conteúdo seja apresentado de forma clara e fácil de ler.
+
+@@06
+Interceptor para manipulação de respostas
+PRÓXIMA ATIVIDADE
+
+Em um projeto Angular, você implementou um interceptor para manipular as respostas das requisições HTTP antes que elas alcancem os componentes da aplicação. Isso é útil para pré-processar os dados, realizar transformações ou tratamentos específicos nas respostas da API.
+@Injectable()
+export class ResponseInterceptor implements HttpInterceptor {
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    return next.handle(request).pipe(
+      map((event: HttpEvent<any>) => {
+        if (event instanceof HttpResponse) {
+          return event.clone({ body: this.transformData(event.body) });
+        }
+        return event;
+      })
+    );
+  }
+
+  private transformData(data: any): any {
+    // Lógica de transformação dos dados aqui
+    return data;
+  }
+}
+COPIAR CÓDIGO
+Qual é o papel do ResponseInterceptor no código acima e como ele pode ser utilizado para melhorar a qualidade e a eficiência da aplicação?
+
+O ResponseInterceptor intercepta as respostas das requisições HTTP e realiza transformações nos dados antes que sejam processados pelos componentes da aplicação. Isso pode incluir formatação, tradução ou qualquer outra manipulação necessária.
+ 
+O ResponseInterceptor intercepta respostas HTTP e realiza transformações nos dados, melhorando a qualidade dos dados antes que sejam utilizados pelos componentes da aplicação. Essas transformações podem incluir a formatação de datas, a tradução de mensagens ou qualquer outra manipulação necessária para melhorar a experiência da pessoa usuária.
+Alternativa correta
+O ResponseInterceptor redireciona automaticamente as respostas para diferentes endpoints da aplicação com base no tipo de conteúdo, garantindo uma melhor organização dos dados na aplicação.
+ 
+Alternativa correta
+O ResponseInterceptor intercepta as respostas HTTP e automaticamente reenvia qualquer resposta que tenha um código de status 500, garantindo que os erros sejam tratados pelo servidor antes de chegar à aplicação.
+ 
+Alternativa correta
+O ResponseInterceptor bloqueia automaticamente qualquer resposta que contenha dados sensíveis, garantindo que essas respostas não sejam acessíveis pelos componentes da aplicação.
+
+@@07
+Implementando um serviço de notificação
+
+Agora, nós já temos um interceptor (interceptador) que consegue capturar os erros da aplicação. Falta notificarmos a pessoa usuária de que um erro ocorreu. Para fazer isso, acessaremos a documentação do Angular Material, na seção de componentes. Na coluna de esquerda estão listados todos os componentes, e clicaremos para acessar a página do Snackbar.
+Na parte superior da página há três abas: Overview (Visão geral), API e Examples (Exemplos). Ao acessarmos a aba de exemplos e rolarmos até o final, teremos um exemplo com o botão "Pool party!" (Festa na piscina). Clicando nesse botão, surge um tipo de pop-up no canto inferior esquerdo da tela, informando à pessoa usuária que algo ocorreu.
+
+Para termos esse efeito, acessaremos a aba de API e copiaremos a importação do módulo. Em seguida, retornaremos ao VS Code, onde navegaremos para "core > material > material.module.ts. Após a importação do MatToolbarModule, colaremos a importação da SnackBar. Em seguida, copiaremos o nome do módulo e colaremos dentro de exports, ao final da lista.
+
+//código omitido
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+
+@NgModule({
+  exports: [
+    MatToolbarModule,
+    MatButtonModule,
+    MatCardModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatDialogModule,
+    MatAutocompleteModule,
+    MatRadioModule,
+    MatDividerModule,
+    MatCheckboxModule,
+    MatSliderModule,
+    MatSnackBarModule
+  ]
+})
+export class MaterialModule { }
+COPIAR CÓDIGO
+Pronto, agora já posso utilizá-lo e podemos fechar o material.module.ts. Retornando à documentação, procuraremos por um exemplo parecido ao que queremos, na aba "Examples". Voltaremos ao último exemplo da página e clicaremos no botão com o ícone de código (< >). Com isso, acessamos o código desse modelo de SnackBar em três versões: HTML, TS e CSS. Clicaremos na aba TS e copiaremos o que está dentro da classe SnackBarPositionExample, incluindo o método.
+
+horizontalPosition: MatSnackBarHorizontalPosition = 'start';
+verticalPosition: MatSnackBarVerticalPosition = 'bottom';
+
+constructor(private _snackBar: MatSnackBar) {}
+
+openSnackBar() {
+    this._snackBar.open('Cannonball!!', 'Splash', {
+        horizontalPosition: this.horizontalPosition,
+        verticalPosition: this.verticalPosition,
+    });
+}
+COPIAR CÓDIGO
+Voltando para o VS code, ainda não temos nenhum arquivo ou serviço que realize esse tipo de notificação, portanto criaremos um. Abriremos o terminal novamente, com o comando "Ctrl + C" e criaremos um serviço de mensagens, usando o comando ng g s. Como este serviço, apesar de ser inicialmente utilizado para erros, pode ser empregado em toda a aplicação, criaremos dentro da pasta core/services, e o nome mensagem. Também passaremos o --skip-tests não criarmos o arquivo de testes.
+
+ng g s core/services/mensagem --skip-tests
+COPIAR CÓDIGO
+Nosso mensagem.service.ts foi criado. Com ele aberto, colaremos o código que copiamos entre as chaves do MensagemService, no lugar do constructor(). Precisaremos fazer a importação de alguns componentes, mas, feito isso, temos o construtor.
+
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MensagemService {
+
+  horizontalPosition: MatSnackBarHorizontalPosition = 'start';
+  verticalPosition: MatSnackBarVerticalPosition = 'bottom';
+
+  constructor(private _snackBar: MatSnackBar) {}
+
+  openSnackBar() {
+    this._snackBar.open('Cannonball!!', 'Splash', {
+      horizontalPosition: this.horizontalPosition,
+      verticalPosition: this.verticalPosition,
+    });
+  }
+}
+COPIAR CÓDIGO
+O método openSnackBar() fará com que o SnackBar seja aberto e possamos passar algumas configurações para esse método. Por exemplo, podemos escolher a posição horizontal e vertical de onde ele surgirá, assim como a duração e a mensagem. Nosso método receberá a mensagem como parâmetro, que será do String, e a que será exibida ao usuário.
+
+No segundo parâmetro, podemos adicionar uma palavra para o botão que vai fechar a SnackBar, como um 'X', mas não quero que a pessoa usuária precise clicar para esse SnackBar fechar. Depois adicionaremos uma duração para o SnackBar fechar, então podemos deixar o segundo parâmetro como undefined.
+
+//código omitido
+openSnackBar(message: string) {
+    this._snackBar.open(message, undefined, {
+        horizontalPosition: this.horizontalPosition,
+        verticalPosition: this.verticalPosition,
+    });
+}
+COPIAR CÓDIGO
+As opções da posição horizontal (horizontalPosition) são amplas, mas definiremos como right para que apareça à direita. A posição vertical (verticalPosition) será Top, para aparecer em cima. Além disso, passaremos a duração do SnackBar na linha 16 em milissegundos, escrevendo duration: 3000,, para durar 3000 milissegundos.
+
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MensagemService {
+
+  horizontalPosition: MatSnackBarHorizontalPosition = 'right';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
+
+  constructor(private _snackBar: MatSnackBar) {}
+
+openSnackBar(message: string) {
+    this._snackBar.open(message, undefined, {
+        duration: 3000
+        horizontalPosition: this.horizontalPosition,
+        verticalPosition: this.verticalPosition,
+    });
+}
+}
+COPIAR CÓDIGO
+O nosso serviço de mensagens já está criado e já possui um método, agora precisamos injetar esse serviço no interceptor. Para isso, acessaremos o erros.interceptor.ts e, nos parênteses do constructor(), escreveremos private messagemService: MensagemService para injetarmos o serviço. Agora usaremos o serviço.
+
+Dentro do catchError, apagaremos as duas linhas de console.error() que escrevemos. No lugar, usaremos o serviço, codando this.mensagemService.openSnackBar(errorMessage). Usamos o método openSnackBar(), que pede uma mensagem como parâmetro, e para isso passamos a errorMessage, que é a mensagem de erro que criamos.
+
+@Injectable()
+export class ErrosInterceptor implements HttpInterceptor {
+  constructor(private mensagemService: MensagemService) {}
+
+  intercept(
+    request: HttpRequest<HttpErrorResponse>,
+    next: HttpHandler
+  ): Observable<HttpEvent<HttpErrorResponse>> {
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido';
+
+        if (error.error instanceof ErrorEvent) {
+          errorMessage = `Erro do cliente: ${error.error.message}`;
+        } else if (error.status === 404) {
+          errorMessage = 'Recurso não encontrado';
+        } else if (error.status === 500) {
+          errorMessage = 'Erro interno do servidor';
+        } else if (error.status === 401) {
+          errorMessage = 'Você não está autorizado a acessar este recurso';
+        }
+
+        this.mensagemService.openMessage(errorMessage);
+        console.error('Erro HTTP:', error);
+        console.error('Mensagem de erro:', errorMessage);
+
+        return throwError(() => new Error('Ops, ocorreu um erro'));
+      })
+    );
+  }
+}
+COPIAR CÓDIGO
+Não consertei ainda o erro da unidade-federativa.service.ts, portanto ainda temos o erro 404. Antes de retornarmos à aplicação, abriremos o terminal e enviaremos o ng server para iniciarmos a aplicação novamente. Feito isso, retornaremos para página do Jornada Milhas e recarregaremos a página.
+
+Assim, recarregamos a aplicação, uma SnackBar aparece no canto superior direito com a mensagem "Recurso não encontrado". Porém, está aparecendo na coloração padrão que é cinza, o que não é tão visível na aplicação. Portanto, modificaremos a classe CSS do SnackBar para melhorar a experiência da pessoa usuária.
+
+Retornando ao VS Code, acessaremos o style.scss, que é o arquivo de estilos globais. Ao final do código, adicionaremos a seguinte classe:
+
+.mat-mdc-snack-bar-label {
+     background-color: orange;
+}
+COPIAR CÓDIGO
+Para conseguirmos alterar a coloração padrão do SnackBar, utilizamos a classe do Angular Material, mat-mdc-snack-bar-label. No caso, atribuímos uma coloração laranja para ficar mais visível.
+
+Eu parei o servidor back-end, então poderemos visualizar outro erro. Retornando à aplicação do Jornada Milhas e recarregando a página, recebemos a mensagem "Ocorreu um erro desconhecido", dessa vez em um SnackBar laranja.
+
+Portanto, o interceptor está funcionando. A pessoa vê a aplicação quebrada, mas informamos que um problema está acontecendo, melhorando assim a experiência de uso da aplicação.
+
+https://material.angular.io/components/categories
+
+https://material.angular.io/components/snack-bar/overview
+
+https://material.angular.io/components/snack-bar/examples
+
+https://material.angular.io/components/snack-bar/api
+
+@@08
+O que aprendemos?
+
+Nessa aula, você aprendeu como:
+Entender a finalidade e casos de uso dos interceptors;
+Criar um interceptor para gerenciar erros na aplicação;
+Implementar um serviço de notificação de mensagens utilizando o snackBar do angular material.
