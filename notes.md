@@ -1908,7 +1908,6 @@ Lidar com rotas não encontradas na aplicação.
 
 @@01
 Projeto da aula anterior
-PRÓXIMA ATIVIDADE
 
 Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
 
@@ -1945,7 +1944,6 @@ Deixarei um Para Saber Mais para aprofundar seus conhecimentos sobre o Intercept
 
 @@03
 Para saber mais: Interceptor no Angular
-PRÓXIMA ATIVIDADE
 
 Interceptors em Angular são mecanismos poderosos para "interceptar" e "observar" solicitações HTTP antes que sejam enviadas para o servidor e antes que as respostas retornem ao código que originou a chamada HTTP. Isso oferece uma maneira flexível e modular de adicionar funcionalidades comuns a todas as solicitações HTTP em uma aplicação Angular.
 Casos de Uso dos Interceptors:
@@ -2108,7 +2106,6 @@ De volta à aplicação, abriremos o console, onde observamos o erro "Recurso n�
 
 @@05
 Interceptando requisições
-PRÓXIMA ATIVIDADE
 
 Você está desenvolvendo uma aplicação Angular que precisa exibir uma mensagem de loading sempre que uma requisição HTTP estiver em andamento. Para implementar isso de forma eficiente, você decide usar um interceptor com o código a seguir:
 import { Injectable } from '@angular/core';
@@ -2180,7 +2177,6 @@ O interceptor LoadingInterceptor é responsável por identificar automaticamente
 
 @@06
 Interceptor para manipulação de respostas
-PRÓXIMA ATIVIDADE
 
 Em um projeto Angular, você implementou um interceptor para manipular as respostas das requisições HTTP antes que elas alcancem os componentes da aplicação. Isso é útil para pré-processar os dados, realizar transformações ou tratamentos específicos nas respostas da API.
 @Injectable()
@@ -2404,7 +2400,6 @@ Implementar um serviço de notificação de mensagens utilizando o snackBar do a
 
 @@01
 Projeto da aula anterior
-PRÓXIMA ATIVIDADE
 
 Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
 
@@ -2444,7 +2439,6 @@ Até mais!
 
 @@03
 Para saber mais: ESLint - Elevando a qualidade do código em projetos Angular
-PRÓXIMA ATIVIDADE
 
 O ESLint, uma ferramenta de análise estática de código para JavaScript e TypeScript, tornou-se indispensável na comunidade Angular. Sua utilização vai além de uma mera verificação de sintaxe. É uma ferramenta poderosa que contribui significativamente para a qualidade e consistência do código em projetos Angular.
 Importância do ESLint no Ecossistema Angular
@@ -2582,7 +2576,6 @@ Até mais!
 
 @@05
 Para saber mais: resolvendo os problemas identificados pelo ESLint
-PRÓXIMA ATIVIDADE
 
 O ESLint em um projeto Angular pode detectar diversos erros e problemas comuns de código, ajudando a manter o código-fonte consistente e livre de problemas. Abaixo, estão alguns dos erros mais comuns que o ESLint pode detectar e como resolvê-los:
 Os Erros Mais Comuns Detectados pelo ESLint em um Projeto Angular e Como Resolvê-los
@@ -2760,7 +2753,6 @@ Tudo está funcionando conforme esperado!
 
 @@07
 Projeto final do curso
-PRÓXIMA ATIVIDADE
 
 Caso queira revisar o código do projeto final do curso, você pode baixá-lo neste link ou acessar nosso repositório do Github.
 
@@ -2770,7 +2762,6 @@ https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-5
 
 @@08
 O que aprendemos?
-PRÓXIMA ATIVIDADE
 
 Nessa aula, você aprendeu como:
 Instalar o ESLint;
@@ -2780,7 +2771,6 @@ Corrigir erros e adicionar convenções de código do angular.
 
 @@09
 Parabéns
-PRÓXIMA ATIVIDADE
 
 Parabéns por concluir com sucesso mais um passo desta Jornada. É hora de celebrar! \o/
 Gif mostrando uma menina celebrando
