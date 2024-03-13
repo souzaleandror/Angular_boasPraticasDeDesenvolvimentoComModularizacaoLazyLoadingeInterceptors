@@ -2397,3 +2397,426 @@ Nessa aula, você aprendeu como:
 Entender a finalidade e casos de uso dos interceptors;
 Criar um interceptor para gerenciar erros na aplicação;
 Implementar um serviço de notificação de mensagens utilizando o snackBar do angular material.
+
+#### 13/03/2024
+
+@05-Análise estática de código
+
+@@01
+Projeto da aula anterior
+PRÓXIMA ATIVIDADE
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior, para baixá-lo clique nesse link ou veja nosso repositório do Github.
+
+https://github.com/alura-cursos/3413-jornada-milhas/archive/refs/heads/aula-4.zip
+
+https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-4
+
+@@02
+Conhecendo o ESLint
+
+Estamos quase no final da refatoração do projeto Jornada Milhas. Esse projeto foi desenvolvido ao longo de diversos cursos e por diversas pessoas desenvolvedoras. É comum que haja algumas inconsistências no código, pois cada pessoa tem seu estilo de programação.
+Algumas pessoas usam ponto e vírgula, outras não. Às vezes, existem diferenças na indentação e no espaçamento. Como podemos resolver esses desafios de inconsistências quando trabalhamos em equipe?
+
+Resolvendo as inconsistências
+ESLint
+Uma das opções é usar uma ferramenta de análise estática de código, como o ESLint. Mas, o que é análise estática de código? É quando avaliamos o código e são identificados alguns erros, warnings (avisos) e más práticas no código em tempo de desenvolvimento, sem executar o código.
+
+Instalando o ESLint
+Agora, vamos instalar juntos essa ferramenta. Para isso, abrimos o terminal, e o Angular CLI já tem integração com ESLint. Por isso, podemos digitar o comando ng lint para analisar o código.
+
+ng lint
+COPIAR CÓDIGO
+Ainda não temos o lint instalado, mas podemos consultar a Documentação do ESLint para entender a instalação passo a passo. Ou, no VSCode, quando digitamos o comando ng-lint e ainda não tivermos o lint instalado, o Angular já mostrará o comando para instalar que é ng add @angular-eslint/schematics e perguntará se desejamos instalar.
+
+ng add @angular-eslint/schematics
+COPIAR CÓDIGO
+Pressionamos "Enter" e essa ferramenta será instalada. Esse processo pode levar algum tempo.
+
+Assim que terminar de baixar a ferramenta, fechamos o terminal para verificar o que foi alterado. Observem do lado esquerdo que foi criado o arquivo .eslintrc.json com todas as configurações e algumas regras pré-definidas para a análise de código. Além disso, foram feitas alterações nos arquivos angular.json e package.json, instalando a ferramenta.
+
+Agora, abrimos novamente o terminal, limpamos o terminal com o comando clear e pressionamos a seta para cima para repetir o comando. Logo, ng lint novamente. Agora, ele está analisando o código e vários arquivos, erros e, no final, apresentou 49 problemas, sendo 33 erros e 16 warnings (avisos).
+
+Conclusão
+Esses problemas foram deixados de propósito, para este exato momento, a fim de demonstrar para você como corrigi-los. São diversos erros e vamos aprender agora como corrigir esses erros e aplicar boas práticas e convenções do Angular para melhorar o nosso código.
+
+Até mais!
+
+@@03
+Para saber mais: ESLint - Elevando a qualidade do código em projetos Angular
+PRÓXIMA ATIVIDADE
+
+O ESLint, uma ferramenta de análise estática de código para JavaScript e TypeScript, tornou-se indispensável na comunidade Angular. Sua utilização vai além de uma mera verificação de sintaxe. É uma ferramenta poderosa que contribui significativamente para a qualidade e consistência do código em projetos Angular.
+Importância do ESLint no Ecossistema Angular
+
+Consistência no Código: Uma equipe trabalhando em um projeto Angular geralmente é composta por pessoas desenvolvedoras com diferentes estilos de codificação. O ESLint atua como um guardião, garantindo que o estilo de codificação seja consistente em toda a base de código. Isso é crucial para a legibilidade e manutenção do código a longo prazo.
+Identificação e Correção de Erros de Sintaxe: O ESLint não apenas aponta erros de sintaxe, mas também sugere correções. Isso é fundamental para evitar bugs sutis que podem passar despercebidos durante o desenvolvimento.
+Convenções de Codificação Angular: O Angular tem suas próprias convenções de codificação. O ESLint pode ser configurado para aplicar essas convenções automaticamente, garantindo que o código esteja alinhado com as melhores práticas do framework. Isso é especialmente útil para novos membros da equipe ou para manter padrões consistentes em projetos grandes.
+Regras Personalizadas: Além das regras padrão do Angular, o ESLint permite a criação de regras personalizadas. Isso significa que você pode adaptar as verificações do ESLint de acordo com as necessidades específicas do seu projeto, garantindo que os padrões de codificação específicos sejam aplicados.
+Melhoria Geral da Qualidade do Código: Ao corrigir automaticamente problemas de estilo e padrões de codificação, o ESLint eleva a qualidade do código de forma geral. Códigos mais limpos são mais fáceis de entender, manter e debugar, economizando tempo e esforço da equipe de desenvolvimento.
+Para mais informações, você pode explorar o site oficial do ESLint. Lá, você encontrará recursos valiosos para começar a utilizar essa poderosa ferramenta em seus projetos Angular, promovendo uma codificação eficiente e de alta qualidade.
+
+@@04
+Resolvendo erros
+
+Agora que já temos o ESLint instalado no projeto e passamos o scanner por ele, foi detectado que temos 49 problemas, sendo 33 erros e 16 warnings. A boa notícia é que alguns desses erros podem ser resolvidos automaticamente.
+Resolvendo alguns erros de forma automática
+Abaixo da quantidade de problemas, tem a frase "25 erros podem ser resolvidos com a opção fix (consertar)". Assim, digitamos ng lint --fix no terminal para que o ESLint resolva parte destes problemas.
+
+ng lint --fix
+COPIAR CÓDIGO
+Geralmente, ele resolve questões mais simples, como a adição de um ponto e vírgula ou a remoção de uma tipagem desnecessária. Pronto, agora temos 24 problemas para resolver, como consta no terminal:
+
+24 problems (8 errors, 16 warnings)
+O ESLint agrupa os erros e warnings relacionados no terminal, mostrando também o arquivo onde o erro está acontecendo. Vamos selecionar alguns para resolvermos juntos. Podem ser erros de tipagem, variáveis declaradas que não são utilizadas, ou mesmo convenções e boas práticas não adotadas.
+
+Resolvendo alguns erros manualmente
+Selecionaremos o arquivo cadastro.service.ts para resolvermos um desses erros.
+
+C:\Users\Nayanne\Desktop\Nova_Formação_Angular\Curso_5\3413-jornada-milhas\3413\src\app\autenticacao\services\cadastro.service.ts
+O erro, neste caso, está na linha 1. O HTTPheaders está sendo importado, mas não está sendo utilizado. É comum que na hora de refatorar um código, deixamos de usar alguma classe e esquecemos de remover a importação. Portanto, removeremos o HttpHeaders.
+
+HttpHeaders a ser removido no arquivo cadastro.service.ts
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+// código omitido
+COPIAR CÓDIGO
+Assim, ficamos com:
+
+cadastro.service.ts`
+import { HttpClient, } from '@angular/common/http';
+
+// código omitido
+COPIAR CÓDIGO
+Voltamos ao terminal.
+
+Procurando por mais erros, encontramos um aviso relacionado ao ciclo de vida no arquivo depoimentos.component.ts.
+
+depoimentos.component.ts
+// código omitido
+
+ngOnInit(): void {
+this.service.listar().subscribe( 
+res => {
+this.depoimentos = res;
+}
+)
+// código omitido
+COPIAR CÓDIGO
+Neste arquivo, estamos utilizando na linha 14 a função ngOnInit, mas não estamos implementando a interface OnInit, que é o que vai indicar para o Angular que este componente está utilizando esta função do ciclo de vida.
+
+Portanto, adicionaremos na linha 10 a implementação da interface e a importaremos.
+
+depoimentos.component.ts
+// código omitido
+
+export class DepoimentosComponent implements OnInit{ 
+depoimentos: Depoimento[] = [];
+constructor(private service: DepoimentoService) {
+}
+
+// código omitido
+COPIAR CÓDIGO
+Essa é uma boa prática padrão quando estamos utilizando as funções do ciclo de vida: precisamos implementar a interface.
+
+Voltamos aos erros no terminal.
+
+Vamos então acessar o arquivo form-base.component.ts, que contém vários erros relacionados à tipagem.
+
+form-base.component.ts
+// código omitido
+
+@Output() acaoClique: EventEmitter<any> = new EventEmitter<any>
+@Output() sair: EventEmitter<any> = new EventEmitter<any>()
+
+// código omitido
+COPIAR CÓDIGO
+Nas linhas 19 e 20, estamos usando o EventEmitter e passamos a tipagem como any. Isso porque nos métodos execucao e deslogar (linhas 54 e 58), estamos fazendo uma comunicação entre os componentes e poderíamos passar alguma informação no método emit(), mas não é necessário.
+
+form-base.component.ts
+// código omitido
+
+executarAcao() {
+    this.acaoclique.emit();
+}
+deslogar() {
+    this.sair.emit();
+}
+}
+
+// código omitido
+COPIAR CÓDIGO
+Desejamos apenas capturar quando a pessoa usuária clica em um determinado botão. Portanto, podemos mudar a tipagem de any para void, dado que não iremos passar nenhuma informação.
+
+form-base.component.ts
+// código omitido
+
+@Output() acaoClique: EventEmitter<void> = new EventEmitter<void>
+@Output() sair: EventEmitter<void> = new EventEmitter<void>()
+
+// código omitido
+COPIAR CÓDIGO
+Voltamos ao terminal.
+
+No arquivo form-base.component.html, que está utilizando o Angular Material, notamos que estamos utilizando o mat-label mas o ESLint identificou um aviso que informa que em algum lugar o termo label está sendo usado sozinho.
+
+form-base.component.html
+<!-- código omitido  -->
+
+<label> Gênero</label>
+
+<!-- código omitido  -->
+COPIAR CÓDIGO
+Localizamos isso na linha 50, onde esquecemos de passar o mat- antes do label. Vamos então corrigir adicionando mat- antes de label.
+
+form-base.component.html
+<!-- código omitido  -->
+
+<mat-label> Gênero</mat-label>
+
+<!-- código omitido  -->
+COPIAR CÓDIGO
+Após essas correções, podemos digitar novamente ng-lint no terminal, para verificar quantos problemas ainda restam. Ainda temos 17 problemas. Como a vida de uma pessoa desenvolvedora é resolver problemas, vou deixar essa resolução como exercício para você.
+
+Até mais!
+
+@@05
+Para saber mais: resolvendo os problemas identificados pelo ESLint
+PRÓXIMA ATIVIDADE
+
+O ESLint em um projeto Angular pode detectar diversos erros e problemas comuns de código, ajudando a manter o código-fonte consistente e livre de problemas. Abaixo, estão alguns dos erros mais comuns que o ESLint pode detectar e como resolvê-los:
+Os Erros Mais Comuns Detectados pelo ESLint em um Projeto Angular e Como Resolvê-los
+
+Erro de Sintaxe:
+Detecção: O ESLint pode identificar erros de sintaxe, como falta de ponto e vírgula ou chaves mal fechadas.
+Solução: Revise o código-fonte para corrigir os erros de sintaxe, garantindo que todas as construções estejam corretamente escritas.
+Variáveis Não Utilizadas:
+Detecção: O ESLint pode apontar para variáveis declaradas, mas não utilizadas no código.
+Solução: Remova ou corrija as variáveis que não estão sendo utilizadas para manter o código limpo e legível.
+Funções Não Utilizadas:
+Detecção: Funções declaradas, mas não utilizadas, são identificadas pelo ESLint.
+Solução: Remova ou ajuste as funções que não têm um propósito válido no código.
+Problemas de Espaçamento e Formatação:
+Detecção: O ESLint pode verificar a formatação e espaçamento do código, identificando desvios das convenções definidas.
+Solução: Siga as regras de formatação definidas nas configurações do ESLint, como o uso de tabulação ou espaços e a largura máxima de linha.
+Uso de Variáveis Não Declaradas:
+Detecção: Tentativas de acesso a variáveis não declaradas são identificadas pelo ESLint.
+Solução: Certifique-se de declarar todas as variáveis antes de usá-las, evitando problemas de escopo.
+Variáveis Reatribuídas a Constantes:
+Detecção: Tentativas de reatribuir valores a constantes são sinalizadas pelo ESLint.
+Solução: Use let para variáveis que precisam ser reatribuídas e const para constantes cujos valores não devem ser modificados.
+Problemas com Imports e Módulos:
+Detecção: Erros relacionados à importação de módulos, como caminhos incorretos ou importações não utilizadas, são detectados.
+Solução: Corrija os caminhos dos imports e remova importações não utilizadas.
+Uso de Variáveis Sem Declaração de Tipo:
+Detecção: O ESLint pode apontar para o uso de variáveis sem declaração explícita de tipo.
+Solução: Declare os tipos de variáveis para melhorar a segurança e a compreensão do código.
+Funções com Parâmetros Não Utilizados:
+Detecção: Funções com parâmetros não utilizados são identificadas pelo ESLint.
+Solução: Remova ou ajuste os parâmetros não utilizados para manter o código limpo e eficiente.
+Código Morto ou Inacessível:
+Detecção: O ESLint pode sinalizar partes do código que são inacessíveis ou nunca são executadas.
+Solução: Revise o código para remover trechos inúteis ou garantir que o código inacessível seja alcançável.
+Para resolver esses erros, é fundamental seguir as recomendações do ESLint e revisar o código regularmente. Certifique-se de configurar o ESLint de acordo com as necessidades do seu projeto, incluindo regras personalizadas, e integre-o ao processo de desenvolvimento para que os erros sejam identificados automaticamente durante a escrita do código. Além disso, aproveite as mensagens de erro detalhadas fornecidas pelo ESLint para entender melhor o que precisa ser corrigido.
+
+@@06
+Adicionando novas regras ao ESLint
+
+Resolvi alguns erros e avisos e sobraram 4 problemas aqui no terminal. Esses problemas, constituídos por 2 erros e 2 avisos, estão nos arquivos de seletor-passageiro.component.ts e home.component.ts. Deixei esses problemas propositalmente para discuti-los com você.
+Instalando a extensão do ESLint
+Para nos auxiliar na resolução desses problemas, usaremos uma extensão do ESLint. Para isso, abrimos o menu lateral esquerdo, clicamos no ícone de extensões e pesquisamos por ESLint.
+
+Instalamos e habilitamos a primeira extensão que aparece. A extensão disponibilizará marcações visuais de forma a auxiliar a identificação de problemas: avisos (warnings) são sublinhados em amarelo e erros em vermelho.
+
+Resolvendo os erros
+No home.component.ts, encontramos um erro de tipagem na linha 26, no método navegarParaBusca. Acessando o menu lateral esquerdo, podemos abrir o home.component.html.
+
+home.component.ts
+// código omitido
+
+navegarParaBusca (ev: any) {
+this.router.navigate(['busca']);
+}
+}
+
+// código omitido
+COPIAR CÓDIGO
+Na linha 4, notamos que estamos fazendo um event binding deste método e recebendo o evento. No entanto, no home.component.ts, não sabemos que tipo de evento é esse. Quando temos situações em que desejamos ignorar alguma regra do ESLint, essa extensão pode nos auxiliar.
+
+Para isso, clicamos na lupa do lado esquerdo da linha e algumas opções aparecerão para desabilitar regras específicas para uma linha ou para o arquivo inteiro. Para nosso caso, desabilitamos o aviso para a linha e o de tipagem, "Disable @typescript-eslint/no-unused-vars for the entire file"; "Disable @typescript-eslint/no-explicit-any for this line".
+
+Quando desabilitamos, o ESLint cria um comentário indicando essa escolha.
+
+No arquivo seletor-passageiro.component.ts, os dois erros exibidos estão relacionados com métodos que têm o corpo da função vazio.
+
+seletor-passageiro.component.ts
+// código omitido
+
+value = 0;
+onChange: (val: number) => void = () => {};
+onTouch: () => void = () => {};
+
+// código omitido
+COPIAR CÓDIGO
+No entanto, esses métodos existem devido à implementação da interface na linha 16 e precisamos utilizá-los posteriormente. Assim como feito anteriormente, selecionamos a lupa e desabilitamos a regra para o arquivo inteiro, "Disable @typescript-eslint/no-empty-function for the entire file".
+
+Assim, na primeira linha foi incluído um comentário:
+
+seletor-passageiro.component.ts
+/* eslint-disable @typescript-eslint/no-empty-function */
+
+// código omitido
+COPIAR CÓDIGO
+Quando temos erros ou regras que não se aplicam a determinados arquivos, pode-se adicionar esse comentário na linha 1.
+
+Customizando o ESLint
+Agora, vamos entender como customizar o ESLint. Abrimos e acessamos o arquivo .eslintrc.json, pois esse arquivo é customizável.
+
+Você e sua equipe de pessoas desenvolvedoras podem estabelecer regras de acordo com o projeto e adicionar essas regras no arquivo.
+Adicionamos na parte de regras, após a linha 33, uma vírgula, e inserimos duas regras.:
+
+.eslintrc.json
+// código omitido
+
+],
+"@typescript-eslint/type-annotation-spacing": [ 
+"error",
+    {
+    "before": false,
+    "after": true
+    }
+],
+"semi": [
+    "error", "always"
+]
+
+// código omitido
+COPIAR CÓDIGO
+Uma das regras é em relação ao ponto e vírgula: precisamos padronizar o uso ou não uso do ponto e vírgula. Nesse caso, padronizamos essa regra significando que a utilização do ponto e vírgula é obrigatória. A outra regra é em relação ao espaçamento, a fim de padronizá-lo.
+
+Após adicionar essas duas regras, digitamos ng lint novamente no terminal do VSCode e surgirão vários problemas.
+
+O retorno abaixo foi parcialmente transcrito. Para conferi-lo na íntegra, execute o código na sua máquina.
+X 134 problems (134 errors, 0 warnings)
+134 errors and warnings potentially fixable with the --fix option.
+
+Lint errors found in the listed files.
+
+Alguns locais realmente estavam faltando o ponto e vírgula, não estavam padronizados. Contudo, podemos resolver esses problemas de ponto e vírgula com a opção fix. A questão do espaçamento também pode ser resolvida dessa forma.
+
+Por exemplo, no arquivo promocao.service.ts, temos o método listar na linha 18 com um problema de espaçamento - é uma má prática deixar** espaço após os parênteses**, então temos que removê-lo.
+
+promocao.service.ts
+// código omitido
+
+listar () : Observable<Promocao[]> {
+return this.httpClient.get<Promocao []> (`${this.apiUrl}/promo…
+}
+}
+
+// código omitido
+COPIAR CÓDIGO
+E voltamos ao terminal.
+
+Para facilitar e agilizar, usamos o comando ng lint --fix, e ele modificará os arquivos adicionando o ponto e vírgula, além de ajustar o espaçamento.
+
+ng lint --fix
+COPIAR CÓDIGO
+Obtemos como retorno:
+
+All files pass linting
+Com isso, todos os arquivos passam a seguir as regras que customizamos no ESLint. Espero que tenha entendido a importância de utilizar uma ferramenta de análise estática de código para melhorar a consistência e qualidade geral do seu código.
+
+Agora, executamos a aplicação com o comando ng serve.
+
+ng serve
+COPIAR CÓDIGO
+Obtemos como retorno:
+
+Compiled successfully
+Acessamos o navegador, no endereço localhost:4200. Quando recarregamos a aplicação, percebemos que a aplicação redireciona para a página do erro 404.
+
+Como podemos resolver isso?
+
+Resolvendo o erro 404
+Acessamos o arquivo app-routing.module.ts no VSCode.
+
+Quando a aplicação é carregada, ainda não temos o módulo Home disponível, portanto, o roteador não consegue fazer match com essa rota. Devido a esse problema, precisamos adicionar o HomeModule nos imports, na linha 26.
+
+app-routing.module.ts
+// código omitido
+
+@NgModule({
+imports: [RouterModule.forRoot(routes), HomeModule],
+exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+// código omitido
+COPIAR CÓDIGO
+Agora, quando voltamos à aplicação e recarregamos, acessamos o Jornal de Milhas e clicamos no logotipo na parte superior esquerda. O comportamento agora está adequado - continuamos na página inicial, não somos redirecionados para a página de erro, a menos que tentemos acessar uma página que não existe.
+
+Tudo está funcionando conforme esperado!
+
+@@07
+Projeto final do curso
+PRÓXIMA ATIVIDADE
+
+Caso queira revisar o código do projeto final do curso, você pode baixá-lo neste link ou acessar nosso repositório do Github.
+
+https://github.com/alura-cursos/3413-jornada-milhas/archive/refs/heads/aula-5.zip
+
+https://github.com/alura-cursos/3413-jornada-milhas/tree/aula-5
+
+@@08
+O que aprendemos?
+PRÓXIMA ATIVIDADE
+
+Nessa aula, você aprendeu como:
+Instalar o ESLint;
+Realizar a análise estática de código;
+Configurar novas regras no ESLint;
+Corrigir erros e adicionar convenções de código do angular.
+
+@@09
+Parabéns
+PRÓXIMA ATIVIDADE
+
+Parabéns por concluir com sucesso mais um passo desta Jornada. É hora de celebrar! \o/
+Gif mostrando uma menina celebrando
+
+Neste curso, você mergulhou mais fundo no mundo do Angular. Vamos relembrar alguns dos pontos-chave que você aprendeu:
+
+Modularização: Você aprendeu a dividir seu projeto em módulos, tornando-o mais organizado, fácil de gerenciar e altamente escalável.
+
+Lazy Loading: Agora você sabe como carregar módulos sob demanda, melhorando significativamente o desempenho de suas aplicações.
+
+Interceptor: A capacidade de interceptar e manipular solicitações HTTP é um recurso poderoso do angular que agora você pode aplicar.
+
+Gerenciamento de Erros: Você compreendeu como lidar com erros de forma eficaz, garantindo uma melhor experiência para as pessoas usuárias da aplicação.
+
+ESLint: E com a implementação de boas práticas de codificação usando o ESLint, você está produzindo código limpo e de alta qualidade.
+
+Lembre-se de que cada desafio que você enfrentou foi uma oportunidade valiosa para o seu crescimento; este é apenas o começo de um caminho incrível e promissor.
+
+Fico muito feliz em fazer parte da sua jornada de aprendizado no Angular!
+
+Um grande abraço e até o próximo mergulho, Nay !
+
+@@10
+Conclusão
+
+Parabéns por ter concluído mais este curso e toda essa jornada!
+O que aprendemos?
+Nós refatoramos o projeto Jornada Milhas, aplicando o conceito de modularização. Conseguimos carregar esses módulos sob demanda, utilizando o Lazy Loading e melhorando a performance da aplicação.
+
+Também aprendemos como gerenciar erros na aplicação, utilizando o serviço de notificação de mensagem para a pessoa usuária. Além disso, instalamos a ferramenta ESLint para ajudar a resolver erros e melhorar a consistência e a qualidade geral do código.
+
+Fico muito contente em fazer parte da sua jornada.
+
+Convido você a compartilhar a sua evolução no LinkedIn e no Discord.
+
+Te desejo muito sucesso.
+
+Um grande abraço e até o próximo mergulho!
+
